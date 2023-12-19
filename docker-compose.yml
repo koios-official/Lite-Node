@@ -3,13 +3,21 @@ version: '3'
 services:
   cardano-node:
     image: cardanocommunity/cardano-node:latest
+    hostname: cardano-node
     environment:
       NETWORK: ${NETWORK}
+      SOCKET: "${CNODE_HOME}/sockets/node.socket" 
     volumes:
       - node-db:/opt/cardano/cnode/db
       - node-ipc:/opt/cardano/cnode/sockets
       - node-cfg:/opt/cardano/cnode/priv/files
+      - ./scripts/:/scripts/
     restart: on-failure
+    healthcheck:
+      test: ["CMD-SHELL", "netstat -ntlp | grep 12798"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     logging:
       driver: "json-file"
       options:
@@ -18,6 +26,7 @@ services:
 
   cardano-db-sync:
     image: ghcr.io/input-output-hk/cardano-db-sync:sancho-2-3-0-docker
+    hostname: cardano-db-sync
     environment:
       DISABLE_LEDGER: ${DISABLE_LEDGER}
       NETWORK: ${NETWORK:-mainnet}
@@ -29,15 +38,23 @@ services:
       RESTORE_SNAPSHOT: ${RESTORE_SNAPSHOT:-}
       RESTORE_RECREATE_DB: N
       EXTRA_DB_SYNC_ARGS: ${EXTRA_DB_SYNC_ARGS:-}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     depends_on:
       # Depend on both services to be healthy before starting.
-      cardano-node:
-        condition: service_healthy
-      postgress:
-        condition: service_healthy
+      # cardano-node:
+      #   condition: service_healthy
+      # postgress:
+      #   condition: service_healthy
+      - postgress
+      - cardano-node
     volumes:
       - db-sync-data:/var/lib/cexplorer
       - node-ipc:/node-ipc
+      - ./scripts/:/scripts/
     restart: on-failure
     logging:
       driver: "json-file"
@@ -47,8 +64,10 @@ services:
 
   postgress:
     image: postgres:13-bullseye
+    hostname: postgress
     volumes:
       - postgresdb:/var/lib/postgresql/data
+      - ./scripts/:/scripts/
     ports:
       - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     environment:
@@ -56,7 +75,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_DB: ${POSTGRES_DB}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U koios"]
+      test: ["CMD-SHELL", "/scripts/lib/postgres_healthcheck.sh"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -68,16 +87,37 @@ services:
         max-size: "200k"
         max-file: "10"
 
+  swagger:
+    image: swaggerapi/swagger-ui
+    ports:
+      - "8080:8080"
+    expose:
+      - "8080"
+    environment:
+      API_URL: http://127.0.0.1:3000/
+
   postgrest:
     image: postgrest/postgrest:v12.0.1
+    hostname: postgrest
     depends_on:
       - postgress
     ports:
       - 8050:8050
+      - 3000:3000
+    volumes:
+      - ./configs/pgrest/grest.conf:/etc/postgrest/postgrest.conf
+      - ./scripts/:/scripts/
     environment:
       PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgress:${POSTGRES_PORT}/${POSTGRES_DB}
       PGRST_DB_ANON_ROLE: ${PGRST_DB_ANON_ROLE}
       PGRST_DB_SCHEMA: public
+      POSTGRES_DB: ${POSTGRES_DB}
+      PGRST_OPENAPI_SERVER_PROXY_URI: http://0.0.0.0:3000
+    # healthcheck:
+    #   test: ["CMD-SHELL", "curl -f http://localhost:3000/ || exit 1"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
     restart: on-failure
     logging:
       driver: "json-file"
@@ -87,6 +127,7 @@ services:
 
   haproxy:
     image: haproxy:2.9.0-bookworm
+    hostname: haproxy
     depends_on:
       - cardano-node
       - cardano-db-sync
@@ -94,8 +135,14 @@ services:
       - postgrest
     volumes:
       - ./configs/haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+      - ./scripts/:/scripts/
     ports:
       - 8053:8053
+    healthcheck:
+      test: ["CMD-SHELL", "haproxy -c -- /usr/local/etc/haproxy/haproxy.cfg"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     restart: on-failure
     logging:
       driver: "json-file"

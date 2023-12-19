@@ -1,3 +1,4 @@
+![Example Image](images/Koios.png)
 # Koios Lite
 
 Koios Lite is a streamlined version of the Koios ecosystem, designed for efficient data synchronization and querying on the Cardano blockchain. This setup uses Docker to create a local environment that mirrors the production setup, making it ideal for development and testing.
@@ -34,3 +35,43 @@ To deploy Koios Lite:
 4. Perform any necessary post-deployment checks to confirm the system is operational.
 
 Remember to secure your deployment according to best practices, including securing your database and API endpoints.
+
+
+
+
+## Admin tool
+A simple script to interact with the all the components of a Koios Lite Node:
+[Admin Tool Documentation](AdminTool.md)
+
+```bash
+>scripts/koios-lite.sh --help
+
+Koios Administration Tool Help Menu:
+------------------------------------
+
+Welcome to the Koios Administration Tool Help Menu.
+
+Below are the available commands and their descriptions:
+
+--about: 			     Displays information about the Koios administration tool.
+--install-dependencies:  Installs necessary dependencies.
+--check-docker: 		 Checks if Docker is running.
+--handle-env-file: 		 Manage .env file.
+--reset-env: 			 Resets the .env file to defaults.
+--docker-status: 		 Shows the status of Docker containers.
+--docker-up: 			 Starts Docker containers defined in docker-compose.yml.
+--docker-down: 			 Stops Docker containers defined in docker-compose.yml.
+--enter-node: 			 Accesses the Cardano Node container.
+--logs-node: 			 Displays logs for the Cardano Node container.
+--gliveview: 			 Executes gLiveView in the Cardano Node container.
+--cntools: 			     Runs CNTools in the Cardano Node container.
+--enter-postgres: 		 Accesses the Postgres container.
+--logs-postgres: 		 Displays logs for the Postgres container.
+--enter-postgrest: 		 Accesses the PostgREST container.
+--logs-postgrest: 		 Displays logs for the PostgREST container.
+--enter-dbsync: 		 Accesses the DBSync container.
+--logs-dbsync: 			 Displays logs for the DBSync container.
+--enter-haproxy: 		 Accesses the HAProxy container.
+--logs-haproxy: 		 Displays logs for the HAProxy container.
+```
+
