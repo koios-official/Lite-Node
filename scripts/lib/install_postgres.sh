@@ -28,8 +28,6 @@ setup_db_basics() {
     echo "Basic DB setup successful."
 }
 
-
-
 # Description : Deployment list (will only proceed if sync status check passes):
   #             : 1) grest DB basics - schema, web_anon user, basic grest-specific tables
   #             : 2) RPC endpoints - with SQL sourced from files/grest/rpc/**.sql
