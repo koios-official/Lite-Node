@@ -525,7 +525,7 @@ menu() {
                         echo "No running PostgreSQL container found."
                     else
                         # Executing commands in the found container
-                        docker exec -u posgres "$container_id" bash -c "/scripts/lib/install_postgres.sh"
+                        docker exec "$container_id" bash -c "/scripts/lib/install_postgres.sh"
                     fi
                     show_splash_screen
                     ;;
