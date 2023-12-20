@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Global configuration
-VERSION=v1.0
+VERSION=0.0.1
 NAME="admin tool"
 # Get the full path of the current script's directory
 script_dir=$(dirname "$(realpath "$BASH_SOURCE")")
@@ -32,11 +32,15 @@ install_dependencies() {
     os_name="$(uname -s)"
     case "${os_name}" in
         Linux*)
-            . /etc/os-release
+            source /etc/os-release
             case "${ID}" in
                 ubuntu|debian)
+                    sudo mkdir -p /etc/apt/keyrings
+                    curl -fsSL https://repo.charm.sh/apt/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg
+                    echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list
+                    sudo apt update && sudo apt install gum
                     gum spin --spinner dot --title "Updating..." -- echo && sudo apt-get update
-                    gum spin --spinner dot --title "Installing..." -- echo && sudo apt-get install -y curl awk gum
+                    gum spin --spinner dot --title "Installing..." -- echo && sudo apt-get install -y curl awk
                     ;;
                 fedora|rhel)
                     gum spin --spinner dot --title "Installing..." -- echo && sudo dnf install -y curl awk gum &> /dev/null
@@ -127,7 +131,7 @@ check_docker() {
 docker_status(){
     # Prepare the Docker status message
     docker_status=$(if check_docker; then
-        echo "$(gum style --foreground 121 --margin 1  "🐳  Docker Installed and Working")";
+        gum style --foreground 121 --margin 1  "🐳  Docker Installed and Working";
     else
         echo "🐳 🔻";
     fi)
@@ -138,7 +142,7 @@ docker_status(){
     local up_icon="$2"
     local down_icon="$3"
 
-    if [[ ! -z $(docker ps -qf "name=${container_name}") ]]; then
+    if [[ -n $(docker ps -qf "name=${container_name}") ]]; then
         echo "${up_icon} $(gum style --foreground 121 " ${container_name}") $(gum style --bold --foreground 121 UP)";
     else
         echo "${down_icon} $(gum style --foreground 160 " ${container_name}") $(gum style --faint --foreground 160 DOWN)";
@@ -281,7 +285,7 @@ handle_env_file() {
         touch .env
     fi
     while true; do
-        action=$(gum choose --height 15 --item.foreground 39 --cursor.foreground 121 "Add Entry" "Edit Entry" "Remove Entry" "View File" "Reset Config" $(gum style --foreground 208 "Back"))
+        action=$(gum choose --height 15 --item.foreground 39 --cursor.foreground 121 "Add Entry" "Edit Entry" "Remove Entry" "View File" "Reset Config" "$(gum style --foreground 208 "Back")")
         
         case "$action" in
             "Add Entry")
@@ -294,11 +298,11 @@ handle_env_file() {
                 else
                    printf "%s=%s\n" "$key" "$value" >> .env
                    clear
-                   gum style --border rounded --border-foreground 121 --padding "1" --margin "1" --foreground green "Current .env content:" "$(cat $KLITE_HOME/.env)"
+                   gum style --border rounded --border-foreground 121 --padding "1" --margin "1" --foreground green "Current .env content:" "$(cat "${KLITE_HOME}"/.env)"
                 fi
                 ;;
             "Edit Entry")
-                line_to_edit=$(cat $KLITE_HOME/.env | gum filter)
+                line_to_edit="$(gum filter < "${KLITE_HOME}"/.env)"
                 key=$(echo "$line_to_edit" | cut -d '=' -f 1)
                 existing_value=$(echo "$line_to_edit" | cut -d '=' -f 2-)
 
@@ -319,7 +323,7 @@ handle_env_file() {
                 fi
                 ;;
             "Remove Entry")
-                line_to_remove=$(cat $KLITE_HOME/.env | gum filter)
+                line_to_remove="$(gum filter < "${KLITE_HOME}"/.env)"
                 key_to_remove=$(echo "$line_to_remove" | cut -d '=' -f 1)
 
                 if [[ -z "$key_to_remove" ]]; then
@@ -328,12 +332,12 @@ handle_env_file() {
                     # Remove the line from .env file
                     sed -i '' "/^$key_to_remove=/d" .env
                     clear
-                    gum style --border rounded --border-foreground 121 --padding "1" --margin "1" --foreground green "Current .env content:" "$(cat $KLITE_HOME/.env)"
+                    gum style --border rounded --border-foreground 121 --padding "1" --margin "1" --foreground green "Current .env content:" "$(cat "${KLITE_HOME}"/.env)"
                 fi
                 ;;
             "View File")
                 clear
-                gum style --border rounded --border-foreground 121 --padding "1" --margin "1" --foreground green "Current .env content:" "$(cat $KLITE_HOME/.env)"
+                gum style --border rounded --border-foreground 121 --padding "1" --margin "1" --foreground green "Current .env content:" "$(cat "${KLITE_HOME}"/.env)"
                 ;;
             "Reset Config")
                     # Logic for reset config
@@ -350,7 +354,7 @@ handle_env_file() {
 # Menu function with improved UI and submenus
 menu() {
     while true; do
-        choice=$(gum choose --height 15 --item.foreground 121 --cursor.foreground 39 "Tools" "Monitor" "Setup" "Config" "About" $(gum style --foreground 160 "Exit"))
+        choice=$(gum choose --height 15 --item.foreground 121 --cursor.foreground 39 "Tools" "Monitor" "Setup" "Config" "About" "$(gum style --foreground 160 "Exit")")
 
         case "$choice" in
             "Tools")
@@ -570,7 +574,7 @@ menu() {
                 "Docker Status" \
                 "Docker Up/Reload" \
                 "Docker Down" \
-                $(gum style --foreground 208 "Back"))
+                "$(gum style --foreground 208 "Back")")
 
             case "$monitor_choice" in
                 "Docker Status")
@@ -584,13 +588,13 @@ menu() {
                     # Logic for Docker Up
                     clear
                     show_splash_screen
-                    gum spin --spinner dot --spinner.bold --show-output --title.align center --title.bold --spinner.foreground 121 --title.foreground 121  --title "Koios Lite Starting services..." -- echo && docker-compose -f $KLITE_HOME/docker-compose.yml up -d
+                    gum spin --spinner dot --spinner.bold --show-output --title.align center --title.bold --spinner.foreground 121 --title.foreground 121  --title "Koios Lite Starting services..." -- echo && docker-compose -f "${KLITE_HOME}"/docker-compose.yml up -d
                     ;;
                 "Docker Down")
                     # Logic for Docker Down
                     clear
                     show_splash_screen
-                    gum spin --spinner dot --spinner.bold --show-output --title.align center --title.bold --spinner.foreground 202 --title.foreground 202 --title "Koios Lite Stopping services..." -- echo && docker-compose -f $KLITE_HOME/docker-compose.yml down
+                    gum spin --spinner dot --spinner.bold --show-output --title.align center --title.bold --spinner.foreground 202 --title.foreground 202 --title "Koios Lite Stopping services..." -- echo && docker-compose -f "${KLITE_HOME}"/docker-compose.yml down
                     ;;
                 "Back")
                     # Back to Main Menu
@@ -634,7 +638,7 @@ show_splash_screen(){
     
     combined_layout2=$(gum join --horizontal \
         "$(gum style --bold --align center "Koios Lite Node")" \
-        "$(gum style --faint --foreground 229 --align center " - $NAME $VERSION")")
+        "$(gum style --faint --foreground 229 --align center " - $NAME v$VERSION")")
 
     combined_layout=$(gum join --vertical \
         "$combined_layout1 " \
@@ -677,10 +681,10 @@ process_args() {
             docker_status
             ;;
         --docker-up)
-            docker-compose -f "$KLITE_HOME/docker-compose.yml" up -d
+            docker-compose -f "${KLITE_HOME}"/docker-compose.yml up -d
             ;;
         --docker-down)
-            docker-compose -f "$KLITE_HOME/docker-compose.yml" down
+            docker-compose -f "${KLITE_HOME}"/docker-compose.yml down
             ;;
        --enter-node)
             container_id=$(docker ps -qf "name=cardano-node")
@@ -765,18 +769,18 @@ process_args() {
 execute_in_container() {
     local container_name=$1
     local command=$2
-    local container_id=$(docker ps -qf "name=${container_name}")
+    local container_id;container_id=$(docker ps -qf "name=${container_name}")
     if [ -z "$container_id" ]; then
         echo "No running ${container_name} container found."
     else
-        docker exec -it "$container_id" $command
+        docker exec -it "${container_id}" "${command}"
     fi
 }
 
 show_logs() {
     local container_name=$1
-    local container_id=$(docker ps -qf "name=${container_name}")
-    if [ -z "$container_id" ]; then
+    local container_id;container_id=$(docker ps -qf "name=${container_name}")
+    if [ -z "${container_id}" ]; then
         echo "No running ${container_name} container found."
     else
         docker logs "$container_id" | more
