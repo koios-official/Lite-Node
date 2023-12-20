@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # Global configuration
 VERSION=0.0.1
 NAME="admin tool"
@@ -35,15 +34,15 @@ install_dependencies() {
             source /etc/os-release
             case "${ID}" in
                 ubuntu|debian)
-                    sudo mkdir -p /etc/apt/keyrings
-                    curl -fsSL https://repo.charm.sh/apt/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg
+                    [[ ! -d /etc/apt/keyrings ]] && sudo mkdir -p /etc/apt/keyrings
+                    [[ ! -f /etc/apt/keyrings/charm.gpg ]] && curl -fsSL https://repo.charm.sh/apt/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg
                     echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list
                     sudo apt update && sudo apt install gum
                     gum spin --spinner dot --title "Updating..." -- echo && sudo apt-get update
-                    gum spin --spinner dot --title "Installing..." -- echo && sudo apt-get install -y curl awk
+                    gum spin --spinner dot --title "Installing..." -- echo && sudo apt-get install -y curl gawk
                     ;;
                 fedora|rhel)
-                    gum spin --spinner dot --title "Installing..." -- echo && sudo dnf install -y curl awk gum &> /dev/null
+                    gum spin --spinner dot --title "Installing..." -- echo && sudo dnf install -y curl gawk gum &> /dev/null
                     ;;
                 arch|manjaro)
                     gum spin --spinner dot --title "Installing..." -- echo && sudo pacman -S curl awk gum &> /dev/null
@@ -84,10 +83,6 @@ check_docker() {
         else
             return 1
         fi
-    # Check if docker-compose command is available
-    elif ! command -v docker-compose > /dev/null 2>&1; then
-        echo -e "\ndocker-compose not installed.\n"
-        return 1
     # Check if Docker is running by executing a test container
     else
         # Check if Docker is running
@@ -181,7 +176,7 @@ docker_status(){
 # Docker Innstall function
 docker_install() {
     # Check if Docker was already installed
-    if command -v docker > /dev/null 2>&1; then
+    if command -v docker > /dev/null 2>&1 && docker compose version > /dev/null 2>&1 ; then
         echo "Docker is already installed."
         return 0
     fi
@@ -189,11 +184,11 @@ docker_install() {
     os_name="$(uname -s)"
     case "${os_name}" in
         Linux*)
-            . /etc/os-release
+            source /etc/os-release
             case "${ID}" in
                 ubuntu|debian)
                     gum spin --spinner dot --title "Updating..." -- echo && sudo apt-get update
-                    gum spin --spinner dot --title "Installing Docker..." -- echo && sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+                    gum spin --spinner dot --title "Installing Docker..." -- echo && sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
                     ;;
                 fedora|rhel)
                     gum spin --spinner dot --title "Installing Docker..." -- echo && sudo dnf -y install dnf-plugins-core && sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo && sudo dnf install docker-ce docker-ce-cli containerd.io
@@ -582,19 +577,19 @@ menu() {
                     clear
                     show_splash_screen
                     docker_status
-                    # gum style --border rounded --border-foreground 121 --padding "1" --margin "1" --foreground 121 "$(docker-compose ps | awk '{print $4, $8}')"
+                    # gum style --border rounded --border-foreground 121 --padding "1" --margin "1" --foreground 121 "$(docker compose ps | awk '{print $4, $8}')"
                     ;;
                 "Docker Up/Reload")
                     # Logic for Docker Up
                     clear
                     show_splash_screen
-                    gum spin --spinner dot --spinner.bold --show-output --title.align center --title.bold --spinner.foreground 121 --title.foreground 121  --title "Koios Lite Starting services..." -- echo && docker-compose -f "${KLITE_HOME}"/docker-compose.yml up -d
+                    gum spin --spinner dot --spinner.bold --show-output --title.align center --title.bold --spinner.foreground 121 --title.foreground 121  --title "Koios Lite Starting services..." -- echo && docker compose -f "${KLITE_HOME}"/docker-compose.yml up -d
                     ;;
                 "Docker Down")
                     # Logic for Docker Down
                     clear
                     show_splash_screen
-                    gum spin --spinner dot --spinner.bold --show-output --title.align center --title.bold --spinner.foreground 202 --title.foreground 202 --title "Koios Lite Stopping services..." -- echo && docker-compose -f "${KLITE_HOME}"/docker-compose.yml down
+                    gum spin --spinner dot --spinner.bold --show-output --title.align center --title.bold --spinner.foreground 202 --title.foreground 202 --title "Koios Lite Stopping services..." -- echo && docker compose -f "${KLITE_HOME}"/docker-compose.yml down
                     ;;
                 "Back")
                     # Back to Main Menu
@@ -681,10 +676,10 @@ process_args() {
             docker_status
             ;;
         --docker-up)
-            docker-compose -f "${KLITE_HOME}"/docker-compose.yml up -d
+            docker compose -f "${KLITE_HOME}"/docker-compose.yml up -d
             ;;
         --docker-down)
-            docker-compose -f "${KLITE_HOME}"/docker-compose.yml down
+            docker compose -f "${KLITE_HOME}"/docker-compose.yml down
             ;;
        --enter-node)
             container_id=$(docker ps -qf "name=cardano-node")

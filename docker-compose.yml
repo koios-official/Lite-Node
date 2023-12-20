@@ -7,6 +7,7 @@ services:
     environment:
       NETWORK: ${NETWORK}
       SOCKET: "${CNODE_HOME}/sockets/node.socket" 
+      UPDATE_CHECK: "N"
     volumes:
       - node-db:/opt/cardano/cnode/db
       - node-ipc:/opt/cardano/cnode/sockets
@@ -104,7 +105,7 @@ services:
       - postgress
     ports:
       - 8050:8050
-      - 3000:3000
+      #- 3000:3000
     volumes:
       - ./configs/pgrest/grest.conf:/etc/postgrest/postgrest.conf
       - ./scripts/:/scripts/
