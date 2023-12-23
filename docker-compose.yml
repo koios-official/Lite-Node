@@ -64,7 +64,7 @@ services:
         max-file: "10"
 
   postgress:
-    image: postgres:13-bullseye
+    image: postgres:16-bullseye
     hostname: postgress
     volumes:
       - postgresdb:/var/lib/postgresql/data
