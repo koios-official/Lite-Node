@@ -361,34 +361,12 @@ handle_env_file() {
 # Menu function with improved UI and submenus
 menu() {
     while true; do
-        choice=$(gum choose --height 15 --item.foreground 121 --cursor.foreground 39 "Tools" "Monitor" "Setup" "Config" "About" "$(gum style --foreground 160 "Exit")")
+        choice=$(gum choose --height 15 --item.foreground 121 --cursor.foreground 39 "Tools" "Docker" "Setup" "Advanced" "Config" "About" "$(gum style --foreground 160 "Exit")")
 
         case "$choice" in
             "Tools")
-            setup_choice=$(gum choose --height 15 --cursor.foreground 229 --item.foreground 39 "$(gum style --foreground 82  "Enter Cardano Node")" "$(gum style --foreground 85  "Logs Cardano Node")" "$(gum style --foreground 87 "gLiveView")" "$(gum style --foreground 117 "cntools")" "$(gum style --foreground 82 "Enter Postgres")" "$(gum style --foreground 85 "Logs Postgres")" "$(gum style --foreground 87 "Enter PSQL")" "$(gum style --foreground 117 "DBs Lists")" "$(gum style --foreground 82 "Enter Dbsync")" "$(gum style --foreground 85 "Logs Dbsync")" "$(gum style --foreground 85 "Logs PostgREST")" "$(gum style --foreground 82 "Enter HAProxy")" "$(gum style --foreground 85 "Logs HAProxy")" "$(gum style --foreground 208 "Back")")
+            setup_choice=$(gum choose --height 15 --cursor.foreground 229 --item.foreground 39 "$(gum style --foreground 87 "gLiveView")" "$(gum style --foreground 117 "cntools")" "$(gum style --foreground 117 "DBs Lists")" "$(gum style --foreground 208 "Back")")
             case "$setup_choice" in
-                "Enter Cardano Node")
-                    # Enter
-                    container_id=$(docker ps -qf "name=cardano-node")
-                    if [ -z "$container_id" ]; then
-                        echo "No running Node container found."
-                    else
-                        # Executing commands in the found container
-                        docker exec -it "$container_id" bash -c "bash"
-                    fi
-                    show_splash_screen                  
-                    ;;
-                "Logs Cardano Node")
-                    # Enter
-                    container_id=$(docker ps -qf "name=cardano-node")
-                    if [ -z "$container_id" ]; then
-                        echo "No running Node container found."
-                    else
-                        # Logs
-                        docker logs "$container_id" | more
-                    fi
-                    show_splash_screen                  
-                    ;;
                 "gLiveView")
                     # Find the Docker container ID with 'postgres' in the name
                     container_id=$(docker ps -qf "name=cardano-node")
@@ -411,39 +389,6 @@ menu() {
                     fi
                     show_splash_screen           
                     ;;
-                "Enter Postgres")
-                    # Logic for Enter Postgres
-                    container_id=$(docker ps -qf "name=postgress")
-                    if [ -z "$container_id" ]; then
-                        echo "No running PostgreSQL container found."
-                    else
-                        # Executing commands in the found container
-                        docker exec -it "$container_id" bash -c "bash"
-                    fi
-                    show_splash_screen
-                    ;;
-                "Logs Postgres")
-                    # Logic for Enter Postgres
-                    container_id=$(docker ps -qf "name=postgress")
-                    if [ -z "$container_id" ]; then
-                        echo "No running PostgreSQL container found."
-                    else
-                        # Logs
-                        docker logs "$container_id" | more
-                    fi
-                    show_splash_screen
-                    ;;
-                "Enter PSQL")
-                    # Logic for Enter Postgres
-                    container_id=$(docker ps -qf "name=postgress")
-                    if [ -z "$container_id" ]; then
-                        echo "No running PostgreSQL found."
-                    else
-                        # Executing commands in the found container
-                        docker exec -it "$container_id" bash -c "/usr/bin/psql -U $POSTGRES_USER -d $POSTGRES_DB"
-                    fi
-                    show_splash_screen
-                    ;;
                 "DBs Lists")
                     # Logic for Enter Postgres
                     container_id=$(docker ps -qf "name=postgress")
@@ -453,61 +398,6 @@ menu() {
                         # Executing commands in the found container
                         docker exec -it -u postgres "$container_id" bash -c "/scripts/kltables.sh > /scripts/TablesAndIndexesList.txt"
                         echo "TablesAndIndexesList.txt File created in your script folder."
-                    fi
-                    show_splash_screen
-                    ;;
-                "Enter Dbsync")
-                    # Logic for Enter Dbsync
-                    container_id=$(docker ps -qf "name=lite-node-cardano-db-sync")
-                    if [ -z "$container_id" ]; then
-                        echo "No running Dbsync container found."
-                    else
-                        # Executing commands in the found container
-                        docker exec -it "$container_id" bash -c "bash"
-                    fi
-                    show_splash_screen
-                    ;;
-                "Logs Dbsync")
-                    # Logic for Enter Dbsync
-                    container_id=$(docker ps -qf "name=lite-node-cardano-db-sync")
-                    if [ -z "$container_id" ]; then
-                        echo "No running Dbsync container found."
-                    else
-                        # Logs
-                        docker logs "$container_id" | more
-                    fi
-                    show_splash_screen
-                    ;;
-                "Logs PostgREST")
-                    # Logic for Enter PostgREST
-                    container_id=$(docker ps -qf "name=lite-node-postgrest")
-                    if [ -z "$container_id" ]; then
-                        echo "No running PostgREST container found."
-                    else
-                        # Logs
-                        docker logs "$container_id" | more
-                    fi
-                    show_splash_screen
-                    ;;
-                "Enter HAProxy")
-                    # Logic for Enter HAProxy
-                    container_id=$(docker ps -qf "name=lite-node-haproxy")
-                    if [ -z "$container_id" ]; then
-                        echo "No running HAProxy container found."
-                    else
-                        # Executing commands in the found container
-                        docker exec -it "$container_id" bash -c "bash"
-                    fi
-                    show_splash_screen
-                    ;;
-                "Logs HAProxy")
-                    # Logic for Enter HAProxy
-                    container_id=$(docker ps -qf "name=lite-node-haproxy")
-                    if [ -z "$container_id" ]; then
-                        echo "No running HAProxy container found."
-                    else
-                        # Logs
-                        docker logs "$container_id" | more
                     fi
                     show_splash_screen
                     ;;
@@ -575,15 +465,15 @@ menu() {
             esac
             ;;
 
-            "$(gum style --foreground green "Monitor")")
-            # Submenu for Monitor
-            monitor_choice=$(gum choose --height 15 --item.foreground 39 --cursor.foreground 121 \
+            "$(gum style --foreground green "Docker")")
+            # Submenu for Docker
+            Docker_choice=$(gum choose --height 15 --item.foreground 39 --cursor.foreground 121 \
                 "Docker Status" \
                 "Docker Up/Reload" \
                 "Docker Down" \
                 "$(gum style --foreground 208 "Back")")
 
-            case "$monitor_choice" in
+            case "$Docker_choice" in
                 "Docker Status")
                     # Logic for Docker Status
                     clear
@@ -621,7 +511,121 @@ menu() {
                 "$(gum style --align center --width 50 --margin "1 2" --padding "2 4" 'About: ' ' Koios administration tool.')" \
                 "$(gum style --align center --width 50 '//github.com/koios-official/Lite-Node')")"
             ;;
-
+            "Advanced")
+            setup_choice=$(gum choose --height 15 --cursor.foreground 229 --item.foreground 39 "$(gum style --foreground 82  "Enter Cardano Node")" "$(gum style --foreground 85  "Logs Cardano Node")" "$(gum style --foreground 82 "Enter Postgres")" "$(gum style --foreground 85 "Logs Postgres")" "$(gum style --foreground 87 "Enter PSQL")" "$(gum style --foreground 82 "Enter Dbsync")" "$(gum style --foreground 85 "Logs Dbsync")" "$(gum style --foreground 85 "Logs PostgREST")" "$(gum style --foreground 82 "Enter HAProxy")" "$(gum style --foreground 85 "Logs HAProxy")" "$(gum style --foreground 208 "Back")")
+            case "$setup_choice" in
+                "Enter Cardano Node")
+                    # Enter
+                    container_id=$(docker ps -qf "name=cardano-node")
+                    if [ -z "$container_id" ]; then
+                        echo "No running Node container found."
+                    else
+                        # Executing commands in the found container
+                        docker exec -it "$container_id" bash -c "bash"
+                    fi
+                    show_splash_screen                  
+                    ;;
+                "Logs Cardano Node")
+                    # Enter
+                    container_id=$(docker ps -qf "name=cardano-node")
+                    if [ -z "$container_id" ]; then
+                        echo "No running Node container found."
+                    else
+                        # Logs
+                        docker logs "$container_id" | more
+                    fi
+                    show_splash_screen                  
+                    ;;
+                "Enter Postgres")
+                    # Logic for Enter Postgres
+                    container_id=$(docker ps -qf "name=postgress")
+                    if [ -z "$container_id" ]; then
+                        echo "No running PostgreSQL container found."
+                    else
+                        # Executing commands in the found container
+                        docker exec -it "$container_id" bash -c "bash"
+                    fi
+                    show_splash_screen
+                    ;;
+                "Logs Postgres")
+                    # Logic for Enter Postgres
+                    container_id=$(docker ps -qf "name=postgress")
+                    if [ -z "$container_id" ]; then
+                        echo "No running PostgreSQL container found."
+                    else
+                        # Logs
+                        docker logs "$container_id" | more
+                    fi
+                    show_splash_screen
+                    ;;
+                "Enter PSQL")
+                    # Logic for Enter Postgres
+                    container_id=$(docker ps -qf "name=postgress")
+                    if [ -z "$container_id" ]; then
+                        echo "No running PostgreSQL found."
+                    else
+                        # Executing commands in the found container
+                        docker exec -it "$container_id" bash -c "/usr/bin/psql -U $POSTGRES_USER -d $POSTGRES_DB"
+                    fi
+                    show_splash_screen
+                    ;;
+                "Enter Dbsync")
+                    # Logic for Enter Dbsync
+                    container_id=$(docker ps -qf "name=lite-node-cardano-db-sync")
+                    if [ -z "$container_id" ]; then
+                        echo "No running Dbsync container found."
+                    else
+                        # Executing commands in the found container
+                        docker exec -it "$container_id" bash -c "bash"
+                    fi
+                    show_splash_screen
+                    ;;
+                "Logs Dbsync")
+                    # Logic for Enter Dbsync
+                    container_id=$(docker ps -qf "name=lite-node-cardano-db-sync")
+                    if [ -z "$container_id" ]; then
+                        echo "No running Dbsync container found."
+                    else
+                        # Logs
+                        docker logs "$container_id" | more
+                    fi
+                    show_splash_screen
+                    ;;
+                "Logs PostgREST")
+                    # Logic for Enter PostgREST
+                    container_id=$(docker ps -qf "name=lite-node-postgrest")
+                    if [ -z "$container_id" ]; then
+                        echo "No running PostgREST container found."
+                    else
+                        # Logs
+                        docker logs "$container_id" | more
+                    fi
+                    show_splash_screen
+                    ;;
+                "Enter HAProxy")
+                    # Logic for Enter HAProxy
+                    container_id=$(docker ps -qf "name=lite-node-haproxy")
+                    if [ -z "$container_id" ]; then
+                        echo "No running HAProxy container found."
+                    else
+                        # Executing commands in the found container
+                        docker exec -it "$container_id" bash -c "bash"
+                    fi
+                    show_splash_screen
+                    ;;
+                "Logs HAProxy")
+                    # Logic for Enter HAProxy
+                    container_id=$(docker ps -qf "name=lite-node-haproxy")
+                    if [ -z "$container_id" ]; then
+                        echo "No running HAProxy container found."
+                    else
+                        # Logs
+                        docker logs "$container_id" | more
+                    fi
+                    show_splash_screen
+                    ;;
+            esac
+            ;;
             "Exit")
                 clear
                 echo "Thanks for using Koios Lite Node."
