@@ -22,7 +22,7 @@ For local testing:
 1. Clone the repository to your local machine.
 2. Make sure Docker and Docker Compose are installed.
 3. Configure the environment variables in a `.env` file based on the provided `env.example`.
-4. Run `docker-compose up -d` to start the services.
+4. Run `docker compose up -d` to start the services.
 5. Access the local endpoints as needed for testing.
 
 ## Deployment
@@ -30,7 +30,7 @@ For local testing:
 To deploy Koios Lite:
 
 1. Ensure all environment variables are correctly set for the production environment.
-2. Use the command `docker-compose up -d` to start all the services in detached mode.
+2. Use the command `docker compose up -d` to start all the services in detached mode.
 3. Monitor the logs for each service to ensure they are running correctly.
 4. Perform any necessary post-deployment checks to confirm the system is operational.
 
@@ -59,8 +59,8 @@ Below are the available commands and their descriptions:
 --handle-env-file: 		 Manage .env file.
 --reset-env: 			 Resets the .env file to defaults.
 --docker-status: 		 Shows the status of Docker containers.
---docker-up: 			 Starts Docker containers defined in docker-compose.yml.
---docker-down: 			 Stops Docker containers defined in docker-compose.yml.
+--docker-up: 			 Starts Docker containers defined in docker compose.yml.
+--docker-down: 			 Stops Docker containers defined in docker compose.yml.
 --enter-node: 			 Accesses the Cardano Node container.
 --logs-node: 			 Displays logs for the Cardano Node container.
 --gliveview: 			 Executes gLiveView in the Cardano Node container.
