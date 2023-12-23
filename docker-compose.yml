@@ -26,7 +26,7 @@ services:
         max-file: "10"
 
   cardano-db-sync:
-    image: ghcr.io/input-output-hk/cardano-db-sync:sancho-2-3-0-docker
+    image: ghcr.io/intersectmbo/cardano-db-sync:sancho-3-0-0
     hostname: cardano-db-sync
     environment:
       DISABLE_LEDGER: ${DISABLE_LEDGER}
