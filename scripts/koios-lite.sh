@@ -187,13 +187,12 @@ docker_install() {
             source /etc/os-release
             case "${ID}" in
                 ubuntu|debian)
-            # Add Docker's official GPG key:
+                    # Add Docker's official GPG key:
                     sudo apt-get update
                     sudo apt-get install -y ca-certificates curl gnupg
                     sudo install -m 0755 -d /etc/apt/keyrings
                     curl -fsSL https://download.docker.com/linux/${ID}/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
                     sudo chmod a+r /etc/apt/keyrings/docker.gpg
-
                     # Add the repository to Apt sources:
                     echo \
                     "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/${ID} \
@@ -216,9 +215,15 @@ docker_install() {
                     return 1
                     ;;
             esac
+            # Add current user to docker group
+            sudo usermod -aG docker ${USER}
+            exec sudo -i -u ${USER}
             ;;
         Darwin*)
             gum spin --spinner dot --title "Installing Docker..." -- echo && brew install --cask docker
+            # Add current user to docker group
+            sudo dscl . create /Groups/docker
+            sudo dseditgroup -o edit -a $USER -t user docker
             ;;
         MINGW*|MSYS*|CYGWIN*)
             echo "For Windows, please install Docker Desktop manually."
