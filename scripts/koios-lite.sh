@@ -75,8 +75,9 @@ install_dependencies() {
 
 # Check Docker function
 check_docker() {
-    # Check if docker command is available
-    if ! command -v docker > /dev/null 2>&1; then
+    # Check if docker command is available and outputs a version
+    docker_version=$( docker --version | grep "Docker version" )
+    if [ -z "${docker_version}" ]; then
         echo -e "\nDocker not installed.\n"
         if gum confirm --unselected.foreground 231 --unselected.background 39 --selected.bold --selected.background 121 --selected.foreground 231 "Would you like to install Docker now?"; then
             docker_install
@@ -126,7 +127,7 @@ check_docker() {
 docker_status(){
     # Prepare the Docker status message
     docker_status=$(if check_docker; then
-        gum style --foreground 121 --margin 1  "🐳  Docker Installed and Working";
+        gum style --foreground 121 --margin 1  "🐳  ${docker_version} Installed and Working";
     else
         echo "🐳 🔻";
     fi)
