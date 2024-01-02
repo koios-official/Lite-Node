@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION kl.tip()
+CREATE OR REPLACE FUNCTION {{SCHEMA}}.tip()
 RETURNS TABLE (
   hash text,
   epoch_no word31type,
@@ -16,9 +16,9 @@ AS $$
     b.epoch_slot_no AS epoch_slot,
     b.block_no,
     EXTRACT(EPOCH FROM b.time)::integer
-  FROM block b
+  FROM block AS b
   ORDER BY b.id DESC
   LIMIT 1;
 $$;
 
-COMMENT ON FUNCTION kl.tip IS 'Get the tip info about the latest block seen by chain'; -- noqa: LT01
+COMMENT ON FUNCTION {{SCHEMA}}.tip IS 'Get the tip info about the latest block seen by chain'; -- noqa: LT01

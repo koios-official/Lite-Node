@@ -371,7 +371,7 @@ menu() {
 
         case "$choice" in
             "Tools")
-            setup_choice=$(gum choose --height 15 --cursor.foreground 229 --item.foreground 39 "$(gum style --foreground 87 "gLiveView")" "$(gum style --foreground 117 "cntools")" "$(gum style --foreground 117 "DBs Lists")" "$(gum style --foreground 208 "Back")")
+            setup_choice=$(gum choose --height 15 --cursor.foreground 229 --item.foreground 39 "$(gum style --foreground 87 "gLiveView")" "$(gum style --foreground 87 "cntools")"  "$(gum style --foreground 117 "Enter PSQL")" "$(gum style --foreground 117 "DBs Lists")" "$(gum style --foreground 208 "Back")")
             case "$setup_choice" in
                 "gLiveView")
                     # Find the Docker container ID with 'postgres' in the name
@@ -395,6 +395,17 @@ menu() {
                     fi
                     show_splash_screen           
                     ;;
+                "Enter PSQL")
+                    # Logic for Enter Postgres
+                    container_id=$(docker ps -qf "name=postgress")
+                    if [ -z "$container_id" ]; then
+                        echo "No running PostgreSQL found."
+                    else
+                        # Executing commands in the found container
+                        docker exec -it "$container_id" bash -c "/usr/bin/psql -U $POSTGRES_USER -d $POSTGRES_DB"
+                    fi
+                    show_splash_screen
+                    ;;
                 "DBs Lists")
                     # Logic for Enter Postgres
                     container_id=$(docker ps -qf "name=postgress")
@@ -411,7 +422,7 @@ menu() {
             ;;
             "Setup")
                 # Submenu for Setup with plain text options
-                setup_choice=$(gum choose --height 15 --cursor.foreground 229 --item.foreground 39 "Initialise Postgres" "Initialise Dbsync" "Initialise PostgREST" "$(gum style --foreground 208 "Back")")
+                setup_choice=$(gum choose --height 15 --cursor.foreground 229 --item.foreground 39 "Initialise Postgres" "$(gum style --foreground 208 "Back")")
 
             case "$setup_choice" in
                 #"Initialise Cardano Node")
@@ -436,23 +447,23 @@ menu() {
                     fi
                     show_splash_screen
                     ;;
-                "Initialise Dbsync")
-                    # Logic for installing Dbsync
-                    container_id=$(docker ps -qf "name=lite-node-cardano-db-sync")
-                    docker exec "$container_id" bash -c "/scripts/lib/install_dbsync.sh"
-                    ;;
-                "Initialise PostgREST")
-                    # Logic for installing PostgREST
-                    container_id=$(docker ps -qf "name=lite-node-postgrest")
-                    if [ -z "$container_id" ]; then
-                        echo "No running PostgreSQL container found."
-                    else
-                        # Executing commands in the found container
-                        docker exec "$container_id" bash -c "echo ECCO; echo basta"
-                        docker exec "$container_id" bash -c "/scripts/lib/install_postgrest.sh"
-                    fi
-                    show_splash_screen
-                    ;;
+                #"Initialise Dbsync")
+                #    # Logic for installing Dbsync
+                #    container_id=$(docker ps -qf "name=lite-node-cardano-db-sync")
+                #    docker exec "$container_id" bash -c "/scripts/lib/install_dbsync.sh"
+                #    ;;
+                #"Initialise PostgREST")
+                #    # Logic for installing PostgREST
+                #    container_id=$(docker ps -qf "name=lite-node-postgrest")
+                #    if [ -z "$container_id" ]; then
+                #        echo "No running PostgreSQL container found."
+                #    else
+                #        # Executing commands in the found container
+                #        docker exec "$container_id" bash -c "echo ECCO; echo basta"
+                #        docker exec "$container_id" bash -c "/scripts/lib/install_postgrest.sh"
+                #    fi
+                #    show_splash_screen
+                #    ;;
                 #"Initialise HAProxy")
                 #    # Logic for installing HAProxy
                 #    container_id=$(docker ps -qf "name=lite-node-haproxy")
@@ -518,7 +529,7 @@ menu() {
                 "$(gum style --align center --width 50 '//github.com/koios-official/Lite-Node')")"
             ;;
             "Advanced")
-            setup_choice=$(gum choose --height 15 --cursor.foreground 229 --item.foreground 39 "$(gum style --foreground 82  "Enter Cardano Node")" "$(gum style --foreground 85  "Logs Cardano Node")" "$(gum style --foreground 82 "Enter Postgres")" "$(gum style --foreground 85 "Logs Postgres")" "$(gum style --foreground 87 "Enter PSQL")" "$(gum style --foreground 82 "Enter Dbsync")" "$(gum style --foreground 85 "Logs Dbsync")" "$(gum style --foreground 85 "Logs PostgREST")" "$(gum style --foreground 82 "Enter HAProxy")" "$(gum style --foreground 85 "Logs HAProxy")" "$(gum style --foreground 208 "Back")")
+            setup_choice=$(gum choose --height 15 --cursor.foreground 229 --item.foreground 39 "$(gum style --foreground 82  "Enter Cardano Node")" "$(gum style --foreground 85  "Logs Cardano Node")" "$(gum style --foreground 82 "Enter Postgres")" "$(gum style --foreground 85 "Logs Postgres")" "$(gum style --foreground 82 "Enter Dbsync")" "$(gum style --foreground 85 "Logs Dbsync")" "$(gum style --foreground 85 "Logs PostgREST")" "$(gum style --foreground 82 "Enter HAProxy")" "$(gum style --foreground 85 "Logs HAProxy")" "$(gum style --foreground 208 "Back")")
             case "$setup_choice" in
                 "Enter Cardano Node")
                     # Enter
@@ -561,17 +572,6 @@ menu() {
                     else
                         # Logs
                         docker logs "$container_id" | more
-                    fi
-                    show_splash_screen
-                    ;;
-                "Enter PSQL")
-                    # Logic for Enter Postgres
-                    container_id=$(docker ps -qf "name=postgress")
-                    if [ -z "$container_id" ]; then
-                        echo "No running PostgreSQL found."
-                    else
-                        # Executing commands in the found container
-                        docker exec -it "$container_id" bash -c "/usr/bin/psql -U $POSTGRES_USER -d $POSTGRES_DB"
                     fi
                     show_splash_screen
                     ;;
