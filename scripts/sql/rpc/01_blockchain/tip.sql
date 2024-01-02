@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION {{SCHEMA}}.tip()
+CREATE OR REPLACE FUNCTION kl.tip()
 RETURNS TABLE (
   hash text,
   epoch_no word31type,
@@ -21,4 +21,4 @@ AS $$
   LIMIT 1;
 $$;
 
-COMMENT ON FUNCTION {{SCHEMA}}.tip IS 'Get the tip info about the latest block seen by chain'; -- noqa: LT01
+COMMENT ON FUNCTION kl.tip IS 'Get the tip info about the latest block seen by chain'; -- noqa: LT01

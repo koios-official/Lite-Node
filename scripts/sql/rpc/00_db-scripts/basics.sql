@@ -60,24 +60,24 @@ CREATE TABLE IF NOT EXISTS {{SCHEMA}}.control_table (
   artifacts text
 );
 
--- GENESIS TABLE --
-DROP TABLE IF EXISTS {{SCHEMA}}.genesis;
+-- -- GENESIS TABLE --
+-- DROP TABLE IF EXISTS {{SCHEMA}}.genesis;
 
--- Data Types are intentionally kept varchar for single ID row to avoid future edge cases
-CREATE TABLE {{SCHEMA}}.genesis (
-  networkmagic varchar,
-  networkid varchar,
-  activeslotcoeff varchar,
-  updatequorum varchar,
-  maxlovelacesupply varchar,
-  epochlength varchar,
-  systemstart varchar,
-  slotsperkesperiod varchar,
-  slotlength varchar,
-  maxkesrevolutions varchar,
-  securityparam varchar,
-  alonzogenesis varchar
-);
+-- -- Data Types are intentionally kept varchar for single ID row to avoid future edge cases
+-- CREATE TABLE {{SCHEMA}}.genesis (
+--   networkmagic varchar,
+--   networkid varchar,
+--   activeslotcoeff varchar,
+--   updatequorum varchar,
+--   maxlovelacesupply varchar,
+--   epochlength varchar,
+--   systemstart varchar,
+--   slotsperkesperiod varchar,
+--   slotlength varchar,
+--   maxkesrevolutions varchar,
+--   securityparam varchar,
+--   alonzogenesis varchar
+-- );
 
 
 -- DROP EXISTING FUNCTIONS

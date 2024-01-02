@@ -108,7 +108,7 @@ services:
       - 8050:8050
       #- 3000:3000
     volumes:
-      - ./configs/pgrest/grest.conf:/etc/postgrest/postgrest.conf
+      # - ./configs/pgrest/grest.conf:/etc/postgrest/postgrest.conf
       - ./scripts/:/scripts/
     environment:
       PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgress:${POSTGRES_PORT}/${POSTGRES_DB}

@@ -33,6 +33,7 @@ find /scripts/sql/rpc -name '*.sql' | while read -r sql_file; do
     fi
 
     # Remove the temporary file
+    #echo "$TEMP_SQL_FILE"
     rm "$TEMP_SQL_FILE"
 done
 
