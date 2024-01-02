@@ -1,7 +1,0 @@
-/scripts/sql/rpc/v0/views.sql
-/scripts/sql/rpc/account/account_info_cached.sql
-/scripts/sql/rpc/views/asset_token_registry.sql
-/scripts/sql/rpc/assets/policy_asset_list.sql
-/scripts/sql/rpc/pool/pool_blocks.sql
-/scripts/sql/rpc/pool/pool_delegators_history.sql
-/scripts/sql/rpc/00_blockchain/genesis.sql

@@ -411,20 +411,20 @@ menu() {
             ;;
             "Setup")
                 # Submenu for Setup with plain text options
-                setup_choice=$(gum choose --height 15 --cursor.foreground 229 --item.foreground 39 "Initialise Cardano Node"  "Initialise Postgres" "Initialise Dbsync" "Initialise PostgREST" "Initialise HAProxy" "$(gum style --foreground 208 "Back")")
+                setup_choice=$(gum choose --height 15 --cursor.foreground 229 --item.foreground 39 "Initialise Postgres" "Initialise Dbsync" "Initialise PostgREST" "$(gum style --foreground 208 "Back")")
 
             case "$setup_choice" in
-                "Initialise Cardano Node")
-                    # Find the Docker container ID with 'postgres' in the name
-                    container_id=$(docker ps -qf "name=cardano-node")
-                    if [ -z "$container_id" ]; then
-                        echo "No running Node container found."
-                    else
-                        # Executing commands in the found container
-                        docker exec "$container_id" bash -c "/scripts/lib/install_cardano_node.sh"
-                    fi
-                    show_splash_screen                
-                    ;;
+                #"Initialise Cardano Node")
+                #    # Find the Docker container ID with 'postgres' in the name
+                #    container_id=$(docker ps -qf "name=cardano-node")
+                #    if [ -z "$container_id" ]; then
+                #        echo "No running Node container found."
+                #    else
+                #        # Executing commands in the found container
+                #        docker exec "$container_id" bash -c "/scripts/lib/install_cardano_node.sh"
+                #    fi
+                #    show_splash_screen                
+                #    ;;
                 "Initialise Postgres")
                     # Logic for installing Postgres
                     container_id=$(docker ps -qf "name=postgress")
@@ -453,17 +453,17 @@ menu() {
                     fi
                     show_splash_screen
                     ;;
-                "Initialise HAProxy")
-                    # Logic for installing HAProxy
-                    container_id=$(docker ps -qf "name=lite-node-haproxy")
-                    if [ -z "$container_id" ]; then
-                        echo "No running PostgreSQL container found."
-                    else
-                        # Executing commands in the found container
-                        docker exec "$container_id" bash -c "/scripts/lib/install_haproxy.sh"
-                    fi
-                    show_splash_screen
-                    ;;
+                #"Initialise HAProxy")
+                #    # Logic for installing HAProxy
+                #    container_id=$(docker ps -qf "name=lite-node-haproxy")
+                #    if [ -z "$container_id" ]; then
+                #        echo "No running PostgreSQL container found."
+                #    else
+                #        # Executing commands in the found container
+                #        docker exec "$container_id" bash -c "/scripts/lib/install_haproxy.sh"
+                #    fi
+                #    show_splash_screen
+                #    ;;
                 
                 "Back")
                     # Back to Main Menu
