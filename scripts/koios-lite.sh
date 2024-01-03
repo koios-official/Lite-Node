@@ -19,8 +19,6 @@ append_path_to_shell_configs() {
 
 # Function definitions
 install_dependencies() {
-
-    # Check if the dependencies were already installed
     if [ -f "./.dependency_installation_status" ]; then
         return 0
     fi
@@ -31,23 +29,21 @@ install_dependencies() {
             source /etc/os-release
             case "${ID}" in
                 ubuntu|debian)
-                    sudo apt update && sudo apt install -y gnupg curl gawk gum
-                    [[ ! -d /etc/apt/keyrings ]] && sudo mkdir -p /etc/apt/keyrings
-                    [[ ! -f /etc/apt/keyrings/charm.gpg ]] && curl -fsSL https://repo.charm.sh/apt/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg
-                    echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list
-                    gum spin --spinner dot --title "Updating..." -- sudo apt-get update
+                    if ! sudo apt update && sudo apt install -y gnupg curl gawk; then return 1; fi
+                    if ! sudo mkdir -p /etc/apt/keyrings; then return 1; fi
+                    if [[ ! -f /etc/apt/keyrings/charm.gpg ]] && ! curl -fsSL https://repo.charm.sh/apt/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg; then return 1; fi
+                    if ! echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list; then return 1; fi
+                    if ! sudo apt-get update || ! sudo apt install -y gum; then return 1; fi
                     ;;
                 fedora|rhel)
-                    sudo dnf install -y curl gawk gum
-                    # Add any additional Fedora/RHEL specific steps here
+                    if ! sudo dnf install curl awk;  then return 1; fi
+                    if ! curl -L https://github.com/charmbracelet/gum/releases/download/v0.13.0/gum-0.13.0-1.x86_64.rpm -o gum.rpm || ! sudo dnf install -y ./gum.rpm; then return 1; fi
                     ;;
                 arch|manjaro)
-                    sudo pacman -Syu curl awk gum
-                    # Add any additional Arch/Manjaro specific steps here
+                    if ! sudo pacman -Syu curl awk gum; then return 1; fi
                     ;;
                 alpine)
-                    sudo apk add curl awk gum
-                    # Add any additional Alpine specific steps here
+                    if ! sudo apk add curl awk gum; then return 1; fi
                     ;;
                 *)
                     echo "Unsupported Linux distribution for automatic installation."
@@ -56,10 +52,10 @@ install_dependencies() {
             esac
             ;;
         Darwin*)
-            brew install  curl awk gum &> /dev/null
+            if ! brew install curl awk gum; then return 1; fi
             ;;
         MINGW*|MSYS*|CYGWIN*)
-            winget install  curl awk gum &> /dev/null
+            if ! winget install curl awk gum; then return 1; fi
             ;;
         *)
             echo "Unsupported operating system."
@@ -67,10 +63,10 @@ install_dependencies() {
             ;;
     esac
 
-    # Create a file to indicate successful installation
     touch "./.dependency_installation_status"
     echo "Dependencies installed successfully."
 }
+
 
 
 # Check Docker function
@@ -722,6 +718,7 @@ process_args() {
                 show_ui=false
             ;;
         --install-dependencies)
+            rm ./.dependency_installation_status 
             install_dependencies && echo -e "\nDone!!\n"
             ;;
         --check-docker)
