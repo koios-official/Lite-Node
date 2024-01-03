@@ -134,15 +134,19 @@ docker_status(){
 
     # Function to check the status of a Docker container
     check_container_status() {
-    local container_name="$1"
-    local up_icon="$2"
-    local down_icon="$3"
+      local container_name="$1"
+      local up_icon="$2"
+      local down_icon="$3"
 
-    if [[ -n $(docker ps -qf "name=${container_name}") ]]; then
-        echo "${up_icon} $(gum style --foreground 121 " ${container_name}") $(gum style --bold --foreground 121 UP)";
-    else
-        echo "${down_icon} $(gum style --foreground 160 " ${container_name}") $(gum style --faint --foreground 160 DOWN)";
-    fi
+      if [[ -n $(docker ps -qf "name=${container_name}") ]]; then
+        if [[ -n $(docker ps -f "name=${container_name}" | grep '(unhealthy)') ]]; then
+          echo "${up_icon} $(gum style --foreground 121 " ${container_name}") $(gum style --bold --foreground 160 " UP (unhealthy)")";
+        else
+          echo "${up_icon} $(gum style --foreground 121 " ${container_name}") $(gum style --bold --foreground 121 " UP")";
+        fi
+      else
+        echo "${down_icon} $(gum style --foreground 160 " ${container_name}") $(gum style --faint --foreground 160 " DOWN")";
+      fi
     }
 
     # Check for specific Docker containers
