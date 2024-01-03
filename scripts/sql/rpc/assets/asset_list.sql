@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION koioslite.asset_list()
+CREATE OR REPLACE FUNCTION {{SCHEMA}}.asset_list()
 RETURNS TABLE (
   policy_id text,
   asset_name text,
@@ -16,4 +16,4 @@ AS $$
   ORDER BY ma.policy, ma.name;
 $$;
 
-COMMENT ON FUNCTION koioslite.asset_list IS 'Get a raw listing of all native assets on chain, without any CIP overlays';
+COMMENT ON FUNCTION {{SCHEMA}}.asset_list IS 'Get a raw listing of all native assets on chain, without any CIP overlays';

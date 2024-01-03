@@ -10,7 +10,6 @@
 --------------------------------------------------------------------------------
 -- GREST SCHEMA --
 CREATE SCHEMA IF NOT EXISTS {{SCHEMA}};
-CREATE SCHEMA IF NOT EXISTS {{SCHEMA}}v0;
 
 -- WEB_ANON USER --
 DO $$
@@ -34,10 +33,8 @@ $$;
 
 GRANT USAGE ON SCHEMA public TO authenticator, web_anon;
 GRANT USAGE ON SCHEMA {{SCHEMA}} TO authenticator, web_anon;
-GRANT USAGE ON SCHEMA {{SCHEMA}}v0 TO authenticator, web_anon;
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO authenticator, web_anon;
 GRANT SELECT ON ALL TABLES IN SCHEMA {{SCHEMA}} TO authenticator, web_anon;
-GRANT SELECT ON ALL TABLES IN SCHEMA {{SCHEMA}}v0 TO authenticator, web_anon;
 GRANT web_anon TO authenticator;
 ALTER ROLE authenticator SET statement_timeout = 125000;
 
@@ -45,9 +42,6 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT
 SELECT ON TABLES TO authenticator, web_anon;
 
 ALTER DEFAULT PRIVILEGES IN SCHEMA {{SCHEMA}} GRANT
-SELECT ON TABLES TO authenticator, web_anon;
-
-ALTER DEFAULT PRIVILEGES IN SCHEMA {{SCHEMA}}v0 GRANT
 SELECT ON TABLES TO authenticator, web_anon;
 
 ALTER ROLE web_anon SET search_path TO {{SCHEMA}}, public;
