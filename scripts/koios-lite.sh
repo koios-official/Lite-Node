@@ -449,9 +449,16 @@ menu() {
                     container_id=$(docker ps -qf "name=postgress")
                     if [ -z "$container_id" ]; then
                         echo "No running PostgreSQL container found."
+			read -p "Press enter to continue"
                     else
                         # Executing commands in the found container
                         docker exec "$container_id" bash -c "/scripts/lib/install_postgres.sh"
+			echo -e "SQL scripts have finished processing, following scripts were executed successfully:\n"
+                        docker exec "$container_id" bash -c "cat /scripts/sql/rpc/Ok.txt"
+			echo -e "\n\nThe following errors were encountered during processing:\n"
+                        docker exec "$container_id" bash -c "cat /scripts/sql/rpc/NotOk.txt"
+			echo -e "\n\n"
+			read -p "Press enter key to continue"
                     fi
                     show_splash_screen
                     ;;
@@ -544,6 +551,7 @@ menu() {
                     container_id=$(docker ps -qf "name=cardano-node")
                     if [ -z "$container_id" ]; then
                         echo "No running Node container found."
+			read -p "Press enter to continue"
                     else
                         # Executing commands in the found container
                         docker exec -it "$container_id" bash -c "bash"
@@ -555,6 +563,7 @@ menu() {
                     container_id=$(docker ps -qf "name=cardano-node")
                     if [ -z "$container_id" ]; then
                         echo "No running Node container found."
+			read -p "Press enter to continue"
                     else
                         # Logs
                         docker logs "$container_id" | more
@@ -566,6 +575,7 @@ menu() {
                     container_id=$(docker ps -qf "name=postgress")
                     if [ -z "$container_id" ]; then
                         echo "No running PostgreSQL container found."
+			red -p "Press enter to continue"
                     else
                         # Executing commands in the found container
                         docker exec -it "$container_id" bash -c "bash"
@@ -577,6 +587,7 @@ menu() {
                     container_id=$(docker ps -qf "name=postgress")
                     if [ -z "$container_id" ]; then
                         echo "No running PostgreSQL container found."
+			read -p "Press enter to continue"
                     else
                         # Logs
                         docker logs "$container_id" | more
@@ -588,6 +599,7 @@ menu() {
                     container_id=$(docker ps -qf "name=lite-node-cardano-db-sync")
                     if [ -z "$container_id" ]; then
                         echo "No running Dbsync container found."
+			read -p "Press enter to continue"
                     else
                         # Executing commands in the found container
                         docker exec -it "$container_id" bash -c "bash"
@@ -599,6 +611,7 @@ menu() {
                     container_id=$(docker ps -qf "name=lite-node-cardano-db-sync")
                     if [ -z "$container_id" ]; then
                         echo "No running Dbsync container found."
+			read -p "Press enter to continue"
                     else
                         # Logs
                         docker logs "$container_id" | more
@@ -610,6 +623,7 @@ menu() {
                     container_id=$(docker ps -qf "name=lite-node-postgrest")
                     if [ -z "$container_id" ]; then
                         echo "No running PostgREST container found."
+			read -p "Press enter to continue"
                     else
                         # Logs
                         docker logs "$container_id" | more
@@ -621,6 +635,7 @@ menu() {
                     container_id=$(docker ps -qf "name=lite-node-haproxy")
                     if [ -z "$container_id" ]; then
                         echo "No running HAProxy container found."
+			read -p "Press enter to continue"
                     else
                         # Executing commands in the found container
                         docker exec -it "$container_id" bash -c "bash"
@@ -632,6 +647,7 @@ menu() {
                     container_id=$(docker ps -qf "name=lite-node-haproxy")
                     if [ -z "$container_id" ]; then
                         echo "No running HAProxy container found."
+			read -p "Press enter to continue"
                     else
                         # Logs
                         docker logs "$container_id" | more
