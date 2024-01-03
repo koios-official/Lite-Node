@@ -101,7 +101,7 @@ check_docker() {
                 os_name="$(uname -s)"
                 case "${os_name}" in
                     Linux*)
-                        gum spin --spinner dot --title "Starting Docker..." -- sudo systemctl start docker
+                        gum spin --spinner dot --title "Starting Docker..." -- echo && sudo systemctl start docker
                         ;;
                     Darwin*)
                         gum spin --spinner dot --title "Starting Docker..." -- Open -a Docker
@@ -209,16 +209,16 @@ docker_install() {
                     $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
                     sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
                     gum spin --spinner dot --title "Updating..." -- sudo apt-get update
-                    gum spin --spinner dot --title "Installing Docker..." -- sudo apt-get -y install dockerce dockerce-cli containerd.io dockerbuildx-plugin dockercompose-plugin
+                    gum spin --spinner dot --title "Installing Docker..." -- echo && sudo apt-get -y install dockerce dockerce-cli containerd.io dockerbuildx-plugin dockercompose-plugin
                     ;;
                 fedora|rhel)
-                    gum spin --spinner dot --title "Installing Docker..." -- sudo dnf -y install dnf-plugins-core && sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/dockerce.repo && sudo dnf install dockerce dockerce-cli containerd.io
+                    gum spin --spinner dot --title "Installing Docker..." -- echo && sudo dnf -y install dnf-plugins-core && sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/dockerce.repo && sudo dnf install dockerce dockerce-cli containerd.io
                     ;;
                 arch|manjaro)
-                    gum spin --spinner dot --title "Installing Docker..." -- sudo pacman -Syu docker
+                    gum spin --spinner dot --title "Installing Docker..." -- echo && sudo pacman -Syu docker
                     ;;
                 alpine)
-                    gum spin --spinner dot --title "Installing Docker..." -- sudo apk add docker
+                    gum spin --spinner dot --title "Installing Docker..." -- echo && sudo apk add docker
                     ;;
                 *)
                     echo "Unsupported Linux distribution for automatic Docker installation."
@@ -264,7 +264,7 @@ docker_install() {
     os_name="$(uname -s)"
     case "${os_name}" in
     Linux*)
-        if gum spin --spinner dot --title "Starting Docker..." -- sudo systemctl start docker; then
+        if gum spin --spinner dot --title "Starting Docker..." -- echo && sudo systemctl start docker; then
             echo "Docker installed and started successfully."
         else
             echo "Failed to start Docker on Linux."
@@ -540,13 +540,13 @@ menu() {
                     # Logic for Docker Up
                     clear
                     show_splash_screen
-                    gum spin --spinner dot --spinner.bold --show-output --title.align center --title.bold --spinner.foreground 121 --title.foreground 121  --title "Koios Lite Starting services..." -- docker compose -f "${KLITE_HOME}"/docker-compose.yml up -d
+                    gum spin --spinner dot --spinner.bold --show-output --title.align center --title.bold --spinner.foreground 121 --title.foreground 121  --title "Koios Lite Starting services..." -- echo && docker compose -f "${KLITE_HOME}"/docker-compose.yml up -d
                     ;;
                 "Docker Down")
                     # Logic for Docker Down
                     clear
                     show_splash_screen
-                    gum spin --spinner dot --spinner.bold --show-output --title.align center --title.bold --spinner.foreground 202 --title.foreground 202 --title "Koios Lite Stopping services..." -- docker compose -f "${KLITE_HOME}"/docker-compose.yml down
+                    gum spin --spinner dot --spinner.bold --show-output --title.align center --title.bold --spinner.foreground 202 --title.foreground 202 --title "Koios Lite Stopping services..." -- echo && docker compose -f "${KLITE_HOME}"/docker-compose.yml down
                     ;;
                 "Back")
                     # Back to Main Menu
