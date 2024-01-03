@@ -31,25 +31,24 @@ install_dependencies() {
             source /etc/os-release
             case "${ID}" in
                 ubuntu|debian)
+                    sudo apt update && sudo apt install -y gnupg curl gawk gum
                     [[ ! -d /etc/apt/keyrings ]] && sudo mkdir -p /etc/apt/keyrings
                     [[ ! -f /etc/apt/keyrings/charm.gpg ]] && curl -fsSL https://repo.charm.sh/apt/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg
                     echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list
-                    sudo apt update && sudo apt install gum
-                    if [[ $(command -v gum >/dev/null) ]]; then
-                      echo -e "\nAn error occured! Attempted installing 'gum' , but 'gum' binary not found for the current shell session!\n" && return 1
-                    fi
-                    gum spin --spinner dot --title "Updating..." -- echo && sudo apt-get update
-                    gum spin --spinner dot --title "Installing..." -- echo && sudo apt-get install -y curl gawk
+                    gum spin --spinner dot --title "Updating..." -- sudo apt-get update
                     ;;
-                #fedora|rhel)
-                #    gum spin --spinner dot --title "Installing..." -- echo && sudo dnf install -y curl gawk gum &> /dev/null
-                #    ;;
-                #arch|manjaro)
-                #    gum spin --spinner dot --title "Installing..." -- echo && sudo pacman -S curl awk gum &> /dev/null
-                #    ;;
-                #alpine)
-                #    gum spin --spinner dot --title "Installing..." -- echo && sudo apk add curl awk gum &> /dev/null
-                #    ;;
+                fedora|rhel)
+                    sudo dnf install -y curl gawk gum
+                    # Add any additional Fedora/RHEL specific steps here
+                    ;;
+                arch|manjaro)
+                    sudo pacman -Syu curl awk gum
+                    # Add any additional Arch/Manjaro specific steps here
+                    ;;
+                alpine)
+                    sudo apk add curl awk gum
+                    # Add any additional Alpine specific steps here
+                    ;;
                 *)
                     echo "Unsupported Linux distribution for automatic installation."
                     return 1
@@ -57,10 +56,10 @@ install_dependencies() {
             esac
             ;;
         Darwin*)
-            gum spin --spinner dot --title "Installing..." -- echo && brew install curl awk gum &> /dev/null
+            brew install  curl awk gum &> /dev/null
             ;;
         MINGW*|MSYS*|CYGWIN*)
-            gum spin --spinner dot --title "Installing..." -- echo && winget install curl awk gum &> /dev/null
+            winget install  curl awk gum &> /dev/null
             ;;
         *)
             echo "Unsupported operating system."
@@ -73,10 +72,11 @@ install_dependencies() {
     echo "Dependencies installed successfully."
 }
 
+
 # Check Docker function
 check_docker() {
     # Check if docker command is available and outputs a version
-    docker_version=$( docker --version | grep "Docker version" )
+    docker_version=$(docker --version 2>/dev/null | grep "Docker version")
     if [ -z "${docker_version}" ]; then
         echo -e "\nDocker not installed.\n"
         if gum confirm --unselected.foreground 231 --unselected.background 39 --selected.bold --selected.background 121 --selected.foreground 231 "Would you like to install Docker now?"; then
@@ -96,10 +96,10 @@ check_docker() {
                 os_name="$(uname -s)"
                 case "${os_name}" in
                     Linux*)
-                        gum spin --spinner dot --title "Starting Docker..." -- echo && sudo systemctl start docker
+                        gum spin --spinner dot --title "Starting Docker..." -- sudo systemctl start docker
                         ;;
                     Darwin*)
-                        gum spin --spinner dot --title "Starting Docker..." -- echo && Open -a Docker
+                        gum spin --spinner dot --title "Starting Docker..." -- Open -a Docker
                         ;;
                     *)
                         echo "Cannot start Docker automatically on this OS."                  
@@ -127,26 +127,26 @@ check_docker() {
 docker_status(){
     # Prepare the Docker status message
     docker_status=$(if check_docker; then
-        gum style --foreground 121 --margin 1  "🐳  ${docker_version} Installed and Working";
+        gum style --foreground 121 --margin 1 "🐳 ${docker_version} Installed and Working"
     else
         echo "🐳 🔻";
     fi)
+
 
     # Function to check the status of a Docker container
     check_container_status() {
       local container_name="$1"
       local up_icon="$2"
       local down_icon="$3"
-
-      if [[ -n $(docker ps -qf "name=${container_name}") ]]; then
-        if [[ -n $(docker ps -f "name=${container_name}" | grep -e '(unhealthy)' -e '(health: ') ]]; then
-          echo "${up_icon} $(gum style --foreground 121 " ${container_name}") $(gum style --bold --foreground 160 " UP (unhealthy)")";
+        if [[ -n $(docker ps -qf "name=${container_name}" 2>/dev/null) ]]; then
+            if [[ -n $(docker ps -f "name=${container_name}" 2>/dev/null | grep -e '(unhealthy)' -e '(health: ' 2>/dev/null) ]]; then
+                echo "${up_icon} $(gum style --foreground 160 " ${container_name}" 2>/dev/null) $(gum style --bold --foreground 160 " UP (unhealthy)" 2>/dev/null)";
+            else
+                echo "${up_icon} $(gum style --foreground 121 " ${container_name}" 2>/dev/null) $(gum style --bold --foreground 121 " UP" 2>/dev/null)";
+            fi
         else
-          echo "${up_icon} $(gum style --foreground 121 " ${container_name}") $(gum style --bold --foreground 121 " UP")";
+            echo "${down_icon} $(gum style --foreground 160 " ${container_name}" 2>/dev/null) $(gum style --faint --foreground 160 " DOWN" 2>/dev/null)";
         fi
-      else
-        echo "${down_icon} $(gum style --foreground 160 " ${container_name}") $(gum style --faint --foreground 160 " DOWN")";
-      fi
     }
 
     # Check for specific Docker containers
@@ -203,17 +203,17 @@ docker_install() {
                     "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/${ID} \
                     $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
                     sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-                    gum spin --spinner dot --title "Updating..." -- echo && sudo apt-get update
-                    gum spin --spinner dot --title "Installing Docker..." -- echo && sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+                    gum spin --spinner dot --title "Updating..." -- sudo apt-get update
+                    gum spin --spinner dot --title "Installing Docker..." -- sudo apt-get -y install dockerce dockerce-cli containerd.io dockerbuildx-plugin dockercompose-plugin
                     ;;
                 fedora|rhel)
-                    gum spin --spinner dot --title "Installing Docker..." -- echo && sudo dnf -y install dnf-plugins-core && sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo && sudo dnf install docker-ce docker-ce-cli containerd.io
+                    gum spin --spinner dot --title "Installing Docker..." -- sudo dnf -y install dnf-plugins-core && sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/dockerce.repo && sudo dnf install dockerce dockerce-cli containerd.io
                     ;;
                 arch|manjaro)
-                    gum spin --spinner dot --title "Installing Docker..." -- echo && sudo pacman -Syu docker
+                    gum spin --spinner dot --title "Installing Docker..." -- sudo pacman -Syu docker
                     ;;
                 alpine)
-                    gum spin --spinner dot --title "Installing Docker..." -- echo && sudo apk add docker
+                    gum spin --spinner dot --title "Installing Docker..." -- sudo apk add docker
                     ;;
                 *)
                     echo "Unsupported Linux distribution for automatic Docker installation."
@@ -221,14 +221,29 @@ docker_install() {
                     ;;
             esac
             # Add current user to docker group
-            sudo usermod -aG docker ${USER}
-            exec sudo -i -u ${USER}
+            if sudo usermod -aG docker "${USER}"; then
+                clear
+                echo "User '${USER}' successfully added to the 'docker' group."
+                echo "For the changes to take effect, kindly log out and then log back in. This will ensure the user is correctly assigned to the new group. After doing so, please re-execute this script."
+                exit 0  # Exit the script successfully
+            else
+                echo "Error: Failed to add user '${USER}' to the 'docker' group."
+                exit 1  # Exit the script with an error status
+            fi
+            # exec sudo -i -u ${USER}
             ;;
         Darwin*)
-            gum spin --spinner dot --title "Installing Docker..." -- echo && brew install --cask docker
+            gum spin --spinner dot --title "Installing Docker..." -- brew install --cask docker
             # Add current user to docker group
-            sudo dscl . create /Groups/docker
-            sudo dseditgroup -o edit -a $USER -t user docker
+            if sudo dscl . create /Groups/docker && sudo dseditgroup -o edit -a $USER -t user docker; then
+                clear
+                echo "User '$USER' successfully added to the 'docker' group."
+                echo "For the changes to take effect, kindly log out and then log back in. This will ensure the user is correctly assigned to the new group. After doing so, please re-execute this script."
+                exit 0  # Exit the script successfully
+            else
+                echo "Error: Failed to add user '$USER' to the 'docker' group."
+                exit 1  # Exit the script with an error status
+            fi
             ;;
         MINGW*|MSYS*|CYGWIN*)
             echo "For Windows, please install Docker Desktop manually."
@@ -244,7 +259,7 @@ docker_install() {
     os_name="$(uname -s)"
     case "${os_name}" in
     Linux*)
-        if gum spin --spinner dot --title "Starting Docker..." -- echo && sudo systemctl start docker; then
+        if gum spin --spinner dot --title "Starting Docker..." -- sudo systemctl start docker; then
             echo "Docker installed and started successfully."
         else
             echo "Failed to start Docker on Linux."
@@ -252,7 +267,7 @@ docker_install() {
         fi
         ;;
     Darwin*)
-        if gum spin --spinner dot --title "Starting Docker..." -- echo && Open -a Docker; then
+        if gum spin --spinner dot --title "Starting Docker..." -- Open -a Docker; then
             echo "Docker installed and started successfully."
         else
             echo "Failed to start Docker on macOS."
@@ -517,13 +532,13 @@ menu() {
                     # Logic for Docker Up
                     clear
                     show_splash_screen
-                    gum spin --spinner dot --spinner.bold --show-output --title.align center --title.bold --spinner.foreground 121 --title.foreground 121  --title "Koios Lite Starting services..." -- echo && docker compose -f "${KLITE_HOME}"/docker-compose.yml up -d
+                    gum spin --spinner dot --spinner.bold --show-output --title.align center --title.bold --spinner.foreground 121 --title.foreground 121  --title "Koios Lite Starting services..." -- docker compose -f "${KLITE_HOME}"/dockercompose.yml up -d
                     ;;
                 "Docker Down")
                     # Logic for Docker Down
                     clear
                     show_splash_screen
-                    gum spin --spinner dot --spinner.bold --show-output --title.align center --title.bold --spinner.foreground 202 --title.foreground 202 --title "Koios Lite Stopping services..." -- echo && docker compose -f "${KLITE_HOME}"/docker-compose.yml down
+                    gum spin --spinner dot --spinner.bold --show-output --title.align center --title.bold --spinner.foreground 202 --title.foreground 202 --title "Koios Lite Stopping services..." -- docker compose -f "${KLITE_HOME}"/dockercompose.yml down
                     ;;
                 "Back")
                     # Back to Main Menu
