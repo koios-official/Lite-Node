@@ -291,7 +291,10 @@ check_env_file() {
     if [ ! -f ".env" ]; then  # Check if .env does not exist
         if [ -f ".env.example" ]; then  # Check if .env.example exists
             cp .env.example .env  # Copy .env.example to .env
-            echo ".env file created from .env.example."
+	    echo ".env file created from .env.example... please inspect the .env file and adjust variables (e.g. network) accordingly"
+	    echo -e "\nCurrent default settings:\n"
+	    cat .env
+	    read -p "Press enter to continue"
         else
             touch .env  # Create a new .env file
             echo "New .env file created."
@@ -809,8 +812,8 @@ process_args() {
         *)
             # Check if the number of arguments is zero
             if [ $# -eq 0 ]; then
+		check_env_file
                 display_ui  # Call the display function
-                check_env_file
             else
                 echo "Unknown command: '$1'"
                 echo "Use --help to see available commands."
