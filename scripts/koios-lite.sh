@@ -29,7 +29,7 @@ install_dependencies() {
             source /etc/os-release
             case "${ID}" in
                 ubuntu|debian)
-                    if ! sudo apt update && sudo apt install -y gnupg curl gawk; then return 1; fi
+                    if ! sudo apt update && sudo apt install -y gpg curl gawk; then return 1; fi
                     if ! sudo mkdir -p /etc/apt/keyrings; then return 1; fi
                     if [[ ! -f /etc/apt/keyrings/charm.gpg ]] && ! curl -fsSL https://repo.charm.sh/apt/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg; then return 1; fi
                     if ! echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list; then return 1; fi
@@ -37,7 +37,16 @@ install_dependencies() {
                     ;;
                 fedora|rhel)
                     if ! sudo dnf install curl awk;  then return 1; fi
-                    if ! curl -L https://github.com/charmbracelet/gum/releases/download/v0.13.0/gum-0.13.0-1.x86_64.rpm -o gum.rpm || ! sudo dnf install -y ./gum.rpm; then return 1; fi
+                    arch=$(uname -m)
+                    if [ "$arch" = "x86_64" ]; then
+                        if ! curl -L https://github.com/charmbracelet/gum/releases/download/v0.13.0/gum-0.13.0-1.x86_64.rpm -o gum.rpm || ! sudo dnf install -y ./gum.rpm; then return 1; fi
+                    elif [ "$arch" = "aarch64" ]; then
+                        if ! curl -L https://github.com/charmbracelet/gum/releases/download/v0.13.0/gum-0.13.0-1.aarch64.rpm -o gum.rpm || ! sudo dnf install -y ./gum.rpm; then return 1; fi
+                        return 1
+                    else
+                        echo "Unsupported architecture."
+                        return 1
+                    fi
                     ;;
                 arch|manjaro)
                     if ! sudo pacman -Syu curl awk gum; then return 1; fi
@@ -190,7 +199,7 @@ docker_install() {
                 ubuntu|debian)
                     # Add Docker's official GPG key:
                     sudo apt-get update
-                    sudo apt-get install -y ca-certificates curl gnupg
+                    sudo apt-get install -y ca-certificates curl gpg
                     sudo install -m 0755 -d /etc/apt/keyrings
                     curl -fsSL https://download.docker.com/linux/${ID}/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
                     sudo chmod a+r /etc/apt/keyrings/docker.gpg
