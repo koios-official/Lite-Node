@@ -13,7 +13,7 @@ NOT_OK_FILE="NotOk.txt"
 > "$NOT_OK_FILE"
 
 # Loop through all .sql files in the rpc folder and its subfolders
-find /scripts/sql/rpc -name '*.sql' | while read -r sql_file; do
+find /scripts/sql/rpc -name '*.sql' | sort | while read -r sql_file; do
     # Create a temporary SQL file
     TEMP_SQL_FILE="temp_$(basename "$sql_file")"
 

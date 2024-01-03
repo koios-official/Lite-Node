@@ -1,0 +1,7 @@
+/scripts/sql/rpc/00_db-scripts/00_reset.sql
+/scripts/sql/rpc/00_db-scripts/01_basics.sql
+/scripts/sql/rpc/01_blockchain/blocks.sql
+/scripts/sql/rpc/01_blockchain/tip.sql
+/scripts/sql/rpc/02_indexes/13_1_00.sql
+/scripts/sql/rpc/accounts/account_list.sql
+/scripts/sql/rpc/assets/asset_list.sql
