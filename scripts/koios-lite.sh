@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Global configuration
 VERSION=0.0.1
 NAME="admin tool"
@@ -7,7 +7,6 @@ script_dir=$(dirname "$(realpath "$BASH_SOURCE")")
 # Remove the last folder from the path and rename it to KLITE_HOME
 KLITE_HOME=$(dirname "$script_dir")
 path_line="export PATH=\"$script_dir:\$PATH\""
-CURL_TIMEOUT=5
 
 # Append path_line to shell configuration files
 append_path_to_shell_configs() {
@@ -23,8 +22,6 @@ install_dependencies() {
 
     # Check if the dependencies were already installed
     if [ -f "./.dependency_installation_status" ]; then
-        # echo "Dependencies already installed."
-        echo " "
         return 0
     fi
 
@@ -38,18 +35,21 @@ install_dependencies() {
                     [[ ! -f /etc/apt/keyrings/charm.gpg ]] && curl -fsSL https://repo.charm.sh/apt/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg
                     echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list
                     sudo apt update && sudo apt install gum
+                    if [[ $(command -v gum >/dev/null) ]]; then
+                      echo -e "\nAn error occured! Attempted installing 'gum' , but 'gum' binary not found for the current shell session!\n" && return 1
+                    fi
                     gum spin --spinner dot --title "Updating..." -- echo && sudo apt-get update
                     gum spin --spinner dot --title "Installing..." -- echo && sudo apt-get install -y curl gawk
                     ;;
-                fedora|rhel)
-                    gum spin --spinner dot --title "Installing..." -- echo && sudo dnf install -y curl gawk gum &> /dev/null
-                    ;;
-                arch|manjaro)
-                    gum spin --spinner dot --title "Installing..." -- echo && sudo pacman -S curl awk gum &> /dev/null
-                    ;;
-                alpine)
-                    gum spin --spinner dot --title "Installing..." -- echo && sudo apk add curl awk gum &> /dev/null
-                    ;;
+                #fedora|rhel)
+                #    gum spin --spinner dot --title "Installing..." -- echo && sudo dnf install -y curl gawk gum &> /dev/null
+                #    ;;
+                #arch|manjaro)
+                #    gum spin --spinner dot --title "Installing..." -- echo && sudo pacman -S curl awk gum &> /dev/null
+                #    ;;
+                #alpine)
+                #    gum spin --spinner dot --title "Installing..." -- echo && sudo apk add curl awk gum &> /dev/null
+                #    ;;
                 *)
                     echo "Unsupported Linux distribution for automatic installation."
                     return 1
@@ -139,7 +139,7 @@ docker_status(){
       local down_icon="$3"
 
       if [[ -n $(docker ps -qf "name=${container_name}") ]]; then
-        if [[ -n $(docker ps -f "name=${container_name}" | grep '(unhealthy)') ]]; then
+        if [[ -n $(docker ps -f "name=${container_name}" | grep -e '(unhealthy)' -e '(health: ') ]]; then
           echo "${up_icon} $(gum style --foreground 121 " ${container_name}") $(gum style --bold --foreground 160 " UP (unhealthy)")";
         else
           echo "${up_icon} $(gum style --foreground 121 " ${container_name}") $(gum style --bold --foreground 121 " UP")";
@@ -707,7 +707,7 @@ process_args() {
                 show_ui=false
             ;;
         --install-dependencies)
-            install_dependencies
+            install_dependencies && echo -e "\nDone!!\n"
             ;;
         --check-docker)
             check_docker

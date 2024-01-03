@@ -31,12 +31,17 @@ To deploy Koios Lite:
 
 1. Ensure all environment variables are correctly set for the production environment.
 2. Use the command `docker compose up -d` to start all the services in detached mode.
-3. Monitor the logs for each service to ensure they are running correctly.
-4. Perform any necessary post-deployment checks to confirm the system is operational.
+3. Use Admin tool to browse to `Tools` > `gLiveView` to monitor that node has reached tip and `Docker` > `Docker Status` to ensure none of the containers are `DOWN` or `UP (unhealthy)` state.
+4. Execute `Setup` > `Initialise Postgres` to deploy custom RPCs and test via PostgREST/HAProxy endpoints using curl:
+```bash
+# PostgREST tip check
+curl http://127.0.0.1:8050/rpc/tip
+
+# HAProxy tip check
+curl http://127.0.0.1:8053/api/v1/tip
+```
 
 Remember to secure your deployment according to best practices, including securing your database and API endpoints.
-
-
 
 
 ## Admin tool
@@ -67,11 +72,8 @@ Below are the available commands and their descriptions:
 --cntools: 			     Runs CNTools in the Cardano Node container.
 --enter-postgres: 		 Accesses the Postgres container.
 --logs-postgres: 		 Displays logs for the Postgres container.
---enter-postgrest: 		 Accesses the PostgREST container.
---logs-postgrest: 		 Displays logs for the PostgREST container.
 --enter-dbsync: 		 Accesses the DBSync container.
 --logs-dbsync: 			 Displays logs for the DBSync container.
 --enter-haproxy: 		 Accesses the HAProxy container.
 --logs-haproxy: 		 Displays logs for the HAProxy container.
 ```
-
