@@ -537,13 +537,13 @@ menu() {
                     # Logic for Docker Up
                     clear
                     show_splash_screen
-                    gum spin --spinner dot --spinner.bold --show-output --title.align center --title.bold --spinner.foreground 121 --title.foreground 121  --title "Koios Lite Starting services..." -- docker compose -f "${KLITE_HOME}"/dockercompose.yml up -d
+                    gum spin --spinner dot --spinner.bold --show-output --title.align center --title.bold --spinner.foreground 121 --title.foreground 121  --title "Koios Lite Starting services..." -- docker compose -f "${KLITE_HOME}"/docker-compose.yml up -d
                     ;;
                 "Docker Down")
                     # Logic for Docker Down
                     clear
                     show_splash_screen
-                    gum spin --spinner dot --spinner.bold --show-output --title.align center --title.bold --spinner.foreground 202 --title.foreground 202 --title "Koios Lite Stopping services..." -- docker compose -f "${KLITE_HOME}"/dockercompose.yml down
+                    gum spin --spinner dot --spinner.bold --show-output --title.align center --title.bold --spinner.foreground 202 --title.foreground 202 --title "Koios Lite Stopping services..." -- docker compose -f "${KLITE_HOME}"/docker-compose.yml down
                     ;;
                 "Back")
                     # Back to Main Menu
