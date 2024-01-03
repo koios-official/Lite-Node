@@ -37,4 +37,6 @@ find /scripts/sql/rpc -name '*.sql' | while read -r sql_file; do
     rm "$TEMP_SQL_FILE"
 done
 
+psql -qt -d "${POSTGRES_DB}" -U "${POSTGRES_USER}" --host="${POSTGRES_HOST}" -c "NOTIFY pgrst, 'reload config'" >/dev/null
+
 echo "Execution complete. Check $OK_FILE and $NOT_OK_FILE for results."

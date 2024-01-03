@@ -725,12 +725,6 @@ process_args() {
         --logs-postgres)
             show_logs "postgress"
             ;;
-        --enter-postgrest)
-            execute_in_container "lite-node-postgrest" "sh"
-            ;;
-        --logs-postgrest)
-            show_logs "lite-node-postgrest"
-            ;;
         --enter-dbsync)
             execute_in_container "lite-node-cardano-db-sync" "bash"
             ;;
@@ -762,8 +756,6 @@ process_args() {
             echo -e "--cntools: \t\t\t Runs CNTools in the Cardano Node container."
             echo -e "--enter-postgres: \t\t Accesses the Postgres container."
             echo -e "--logs-postgres: \t\t Displays logs for the Postgres container."
-            echo -e "--enter-postgrest: \t\t Accesses the PostgREST container."
-            echo -e "--logs-postgrest: \t\t Displays logs for the PostgREST container."
             echo -e "--enter-dbsync: \t\t Accesses the DBSync container."
             echo -e "--logs-dbsync: \t\t\t Displays logs for the DBSync container."
             echo -e "--enter-haproxy: \t\t Accesses the HAProxy container."
