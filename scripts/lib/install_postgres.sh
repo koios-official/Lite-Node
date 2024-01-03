@@ -26,7 +26,7 @@ find /scripts/sql/rpc -name '*.sql' | while read -r sql_file; do
     # Check for "ERROR:" in the SQL output
     if echo "$SQL_OUTPUT" | grep -q "ERROR:"; then
         # If error is found, append the file name to NotOk.txt
-        echo "$sql_file" >> "$NOT_OK_FILE"
+        echo "$sql_file: ${SQL_OUTPUT}" >> "$NOT_OK_FILE"
     else
         # If no error, append the file name to Ok.txt
         echo "$sql_file" >> "$OK_FILE"
