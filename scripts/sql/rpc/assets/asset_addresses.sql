@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION koioslite.asset_addresses(_asset_policy text, _asset_name text DEFAULT '')
+CREATE OR REPLACE FUNCTION {{SCHEMA}}.asset_addresses(_asset_policy text, _asset_name text DEFAULT '')
 RETURNS TABLE (
   payment_address varchar,
   quantity text
@@ -38,4 +38,4 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION koioslite.asset_addresses IS 'Returns a list of addresses with quantity holding the specified asset'; -- noqa: LT01
+COMMENT ON FUNCTION {{SCHEMA}}.asset_addresses IS 'Returns a list of addresses with quantity holding the specified asset'; -- noqa: LT01

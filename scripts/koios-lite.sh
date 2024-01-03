@@ -382,6 +382,7 @@ menu() {
                     container_id=$(docker ps -qf "name=cardano-node")
                     if [ -z "$container_id" ]; then
                         echo "No running Node container found."
+			read -p "Press enter to continue"
                     else
                         # Executing commands in the found container
                         docker exec -it "$container_id" bash -c "/opt/cardano/cnode/scripts/gLiveView.sh"
@@ -393,6 +394,7 @@ menu() {
                     container_id=$(docker ps -qf "name=cardano-node")
                     if [ -z "$container_id" ]; then
                         echo "No running Node container found."
+			read -p "Press enter to continue"
                     else
                         # Executing commands in the found container
                         docker exec -it "$container_id" bash -c "/opt/cardano/cnode/scripts/cntools.sh"
@@ -404,6 +406,7 @@ menu() {
                     container_id=$(docker ps -qf "name=postgress")
                     if [ -z "$container_id" ]; then
                         echo "No running PostgreSQL found."
+			read -p "Press enter to continue"
                     else
                         # Executing commands in the found container
                         docker exec -it "$container_id" bash -c "/usr/bin/psql -U $POSTGRES_USER -d $POSTGRES_DB"
@@ -415,6 +418,7 @@ menu() {
                     container_id=$(docker ps -qf "name=postgress")
                     if [ -z "$container_id" ]; then
                         echo "No running PostgreSQL found."
+			read -p "Press enter to continue"
                     else
                         # Executing commands in the found container
                         docker exec -it -u postgres "$container_id" bash -c "/scripts/kltables.sh > /scripts/TablesAndIndexesList.txt"
