@@ -776,7 +776,7 @@ process_args() {
         --logs-haproxy)
             show_logs "lite-node-haproxy"
             ;;
-        --help)
+        --help|-h)
             echo "Koios Administration Tool Help Menu:"
             echo -e "------------------------------------\n"
             echo -e "Welcome to the Koios Administration Tool Help Menu.\n"
@@ -850,8 +850,8 @@ main() {
     append_path_to_shell_configs
     cd "$KLITE_HOME" || exit
     source .env
-    install_dependencies || { echo "Failed to install dependencies."; exit 1; }
     process_args "$@"  # Process any provided command line arguments
+    install_dependencies || { echo "Failed to install dependencies."; exit 0; }
     if [ "$show_ui" = true ]; then
         display_ui
     fi
