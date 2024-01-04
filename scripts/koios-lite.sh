@@ -204,7 +204,7 @@ docker_install() {
           $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
           sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
           gum spin --spinner dot --title "Updating..." -- sudo apt-get update
-          gum spin --spinner dot --title "Installing Docker..." -- echo && sudo apt-get -y install dockerce dockerce-cli containerd.io dockerbuildx-plugin dockercompose-plugin
+          gum spin --spinner dot --title "Installing Docker..." -- echo && sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
           ;;
         fedora|rhel)
           gum spin --spinner dot --title "Installing Docker..." -- echo && sudo dnf -y install dnf-plugins-core && sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/dockerce.repo && sudo dnf install dockerce dockerce-cli containerd.io
@@ -383,9 +383,12 @@ handle_env_file() {
 # Menu function with improved UI and submenus
 menu() {
     while true; do
-        choice=$(gum choose --height 15 --item.foreground 121 --cursor.foreground 39 "Tools" "Docker" "Setup" "Advanced" "Config" "About" "$(gum style --foreground 160 "Exit")")
+        choice=$(gum choose --height 15 --item.foreground 121 --cursor.foreground 39 "Tools" "Docker" "Setup" "Advanced" "Config" "About" "Refresh Status" "$(gum style --foreground 160 "Exit")")
 
         case "$choice" in
+						"Refresh Status")
+							display_ui
+						;;
             "Tools")
             setup_choice=$(gum choose --height 15 --cursor.foreground 229 --item.foreground 39 "$(gum style --foreground 87 "gLiveView")" "$(gum style --foreground 87 "cntools")"  "$(gum style --foreground 117 "Enter PSQL")" "$(gum style --foreground 117 "DBs Lists")" "$(gum style --foreground 208 "Back")")
             case "$setup_choice" in
@@ -579,6 +582,7 @@ menu() {
                     else
                         # Logs
                         docker logs "$container_id" | more
+												read -r -p "End of logs reached, press enter to continue"
                     fi
                     show_splash_screen                  
                     ;;
@@ -603,6 +607,7 @@ menu() {
                     else
                         # Logs
                         docker logs "$container_id" | more
+												read -r -p "End of logs reached, press enter to continue"
                     fi
                     show_splash_screen
                     ;;
@@ -627,6 +632,7 @@ menu() {
                     else
                         # Logs
                         docker logs "$container_id" | more
+												read -r -p "End of logs reached, press enter to continue"
                     fi
                     show_splash_screen
                     ;;
@@ -639,6 +645,7 @@ menu() {
                     else
                         # Logs
                         docker logs "$container_id" | more
+												read -r -p "End of logs reached, press enter to continue"
                     fi
                     show_splash_screen
                     ;;
@@ -663,6 +670,7 @@ menu() {
                     else
                         # Logs
                         docker logs "$container_id" | more
+												read -r -p "End of logs reached, press enter to continue"
                     fi
                     show_splash_screen
                     ;;
@@ -679,6 +687,8 @@ menu() {
 
 # Enhanced display UI function using gum layout
 display_ui() {
+	install_dependencies || { echo "Failed to install dependencies."; exit 0; }
+
   show_splash_screen
   # Wait for gum style commands to complete
   menu
@@ -706,6 +716,37 @@ show_splash_screen(){
     --background black \
     --foreground 121 \
     "$combined_layout"
+
+	docker_status
+
+  gum style \
+                --foreground 121 --border-foreground 121 --border double \
+                --align center --width 50 \
+                "Above container status information is accurate as of `date`, use Refresh Status menu option to get latest status"
+}
+
+display_help_usage() {
+      echo "Koios Administration Tool Help Menu:"
+      echo -e "------------------------------------\n"
+      echo -e "Welcome to the Koios Administration Tool Help Menu.\n"
+      echo -e "Below are the available commands and their descriptions:\n"
+      echo -e "--about: \t\t\t Displays information about the Koios administration tool."
+      echo -e "--install-dependencies: \t Installs necessary dependencies."
+      echo -e "--check-docker: \t\t Checks if Docker is running."
+      echo -e "--handle-env-file: \t\t Manage .env file."
+      echo -e "--reset-env: \t\t\t Resets the .env file to defaults."
+      echo -e "--docker-status: \t\t Shows the status of Docker containers."
+      echo -e "--docker-up: \t\t\t Starts Docker containers defined in docker-compose.yml."
+      echo -e "--docker-down: \t\t\t Stops Docker containers defined in docker-compose.yml."
+      echo -e "--enter-node: \t\t\t Accesses the Cardano Node container."
+      echo -e "--logs-node: \t\t\t Displays logs for the Cardano Node container."
+      echo -e "--gliveview: \t\t\t Executes gLiveView in the Cardano Node container."
+      echo -e "--cntools: \t\t\t Runs CNTools in the Cardano Node container."
+      echo -e "--enter-postgres: \t\t Accesses the Postgres container."
+      echo -e "--logs-postgres: \t\t Displays logs for the Postgres container."
+      echo -e "--enter-dbsync: \t\t Accesses the DBSync container."
+      echo -e "--logs-dbsync: \t\t\t Displays logs for the DBSync container."
+      echo -e "--enter-haproxy: \t\t Accesses the HAProxy container."
 }
 
 # Function to process command line arguments
@@ -775,28 +816,7 @@ process_args() {
       show_logs "lite-node-haproxy"
       ;;
     --help|-h)
-      echo "Koios Administration Tool Help Menu:"
-      echo -e "------------------------------------\n"
-      echo -e "Welcome to the Koios Administration Tool Help Menu.\n"
-      echo -e "Below are the available commands and their descriptions:\n"
-      echo -e "--about: \t\t\t Displays information about the Koios administration tool."
-      echo -e "--install-dependencies: \t Installs necessary dependencies."
-      echo -e "--check-docker: \t\t Checks if Docker is running."
-      echo -e "--handle-env-file: \t\t Manage .env file."
-      echo -e "--reset-env: \t\t\t Resets the .env file to defaults."
-      echo -e "--docker-status: \t\t Shows the status of Docker containers."
-      echo -e "--docker-up: \t\t\t Starts Docker containers defined in docker-compose.yml."
-      echo -e "--docker-down: \t\t\t Stops Docker containers defined in docker-compose.yml."
-      echo -e "--enter-node: \t\t\t Accesses the Cardano Node container."
-      echo -e "--logs-node: \t\t\t Displays logs for the Cardano Node container."
-      echo -e "--gliveview: \t\t\t Executes gLiveView in the Cardano Node container."
-      echo -e "--cntools: \t\t\t Runs CNTools in the Cardano Node container."
-      echo -e "--enter-postgres: \t\t Accesses the Postgres container."
-      echo -e "--logs-postgres: \t\t Displays logs for the Postgres container."
-      echo -e "--enter-dbsync: \t\t Accesses the DBSync container."
-      echo -e "--logs-dbsync: \t\t\t Displays logs for the DBSync container."
-      echo -e "--enter-haproxy: \t\t Accesses the HAProxy container."
-      echo -e "--logs-haproxy: \t\t Displays logs for the HAProxy container.\n\n"
+      display_help_usage
       ;;
     *)
       # Check if the number of arguments is zero
@@ -849,7 +869,7 @@ main() {
   cd "$KLITE_HOME" || exit
   source .env
   process_args "$@"  # Process any provided command line arguments
-  install_dependencies || { echo "Failed to install dependencies."; exit 0; }
+  # install_dependencies || { echo "Failed to install dependencies."; exit 0; }
   if [ "$show_ui" = true ]; then
     display_ui
   fi
