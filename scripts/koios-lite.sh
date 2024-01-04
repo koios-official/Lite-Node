@@ -383,7 +383,7 @@ handle_env_file() {
 # Menu function with improved UI and submenus
 menu() {
     while true; do
-        choice=$(gum choose --height 15 --item.foreground 121 --cursor.foreground 39 "Tools" "Docker" "Setup" "Advanced" "Config" "About" "Refresh Status" "$(gum style --foreground 160 "Exit")")
+        choice=$(gum choose --height 15 --item.foreground 121 --cursor.foreground 39 "Tools" "Docker" "Setup" "Advanced" "Config" "Refresh Status" "$(gum style --foreground 160 "Exit")")
 
         case "$choice" in
             "Refresh Status")
@@ -551,14 +551,6 @@ menu() {
               handle_env_file
               ;;
 
-            "About")
-              clear
-              gum style --border rounded --foreground 121 --border-foreground 121 --align center "$(gum join --vertical \
-                "$(show_splash_screen)" \
-                "$(gum style --align center --width 50 --margin "1 2" --padding "2 4" 'About: ' ' Koios administration tool.')" \
-                "$(gum style --align center --width 50 '//github.com/koios-official/Lite-Node')")"
-              ;;
-
             "Advanced")
               setup_choice=$(gum choose --height 15 --cursor.foreground 229 --item.foreground 39 "$(gum style --foreground 82  "Enter Cardano Node")" "$(gum style --foreground 85  "Logs Cardano Node")" "$(gum style --foreground 82 "Enter Postgres")" "$(gum style --foreground 85 "Logs Postgres")" "$(gum style --foreground 82 "Enter Dbsync")" "$(gum style --foreground 85 "Logs Dbsync")" "$(gum style --foreground 85 "Logs PostgREST")" "$(gum style --foreground 82 "Enter HAProxy")" "$(gum style --foreground 85 "Logs HAProxy")" "$(gum style --foreground 208 "Back")")
               case "$setup_choice" in
@@ -616,72 +608,72 @@ menu() {
                   # Logic for Enter Dbsync
                   container_id=$(docker ps -qf "name=lite-node-cardano-db-sync")
                   if [ -z "$container_id" ]; then
-                      echo "No running Dbsync container found."
-                      read -r -p "Press enter to continue"
+                    echo "No running Dbsync container found."
+                    read -r -p "Press enter to continue"
                   else
-                      # Executing commands in the found container
-                      docker exec -it "$container_id" bash -c "bash"
+                    # Executing commands in the found container
+                    docker exec -it "$container_id" bash -c "bash"
                   fi
                   show_splash_screen
                   ;;
                 "Logs Dbsync")
-                    # Logic for Enter Dbsync
-                    container_id=$(docker ps -qf "name=lite-node-cardano-db-sync")
-                    if [ -z "$container_id" ]; then
-                        echo "No running Dbsync container found."
-                        read -r -p "Press enter to continue"
-                    else
-                        # Logs
-                        docker logs "$container_id" | more
-                        read -r -p "End of logs reached, press enter to continue"
-                    fi
-                    show_splash_screen
-                    ;;
+                  # Logic for Enter Dbsync
+                  container_id=$(docker ps -qf "name=lite-node-cardano-db-sync")
+                  if [ -z "$container_id" ]; then
+                    echo "No running Dbsync container found."
+                    read -r -p "Press enter to continue"
+                  else
+                    # Logs
+                    docker logs "$container_id" | more
+                    read -r -p "End of logs reached, press enter to continue"
+                  fi
+                  show_splash_screen
+                  ;;
                 "Logs PostgREST")
-                    # Logic for Enter PostgREST
-                    container_id=$(docker ps -qf "name=lite-node-postgrest")
-                    if [ -z "$container_id" ]; then
-                        echo "No running PostgREST container found."
-                        read -r -p "Press enter to continue"
-                    else
-                        # Logs
-                        docker logs "$container_id" | more
-                        read -r -p "End of logs reached, press enter to continue"
-                    fi
-                    show_splash_screen
-                    ;;
+                  # Logic for Enter PostgREST
+                  container_id=$(docker ps -qf "name=lite-node-postgrest")
+                  if [ -z "$container_id" ]; then
+                    echo "No running PostgREST container found."
+                    read -r -p "Press enter to continue"
+                  else
+                    # Logs
+                    docker logs "$container_id" | more
+                    read -r -p "End of logs reached, press enter to continue"
+                  fi
+                  show_splash_screen
+                  ;;
                 "Enter HAProxy")
-                    # Logic for Enter HAProxy
-                    container_id=$(docker ps -qf "name=lite-node-haproxy")
-                    if [ -z "$container_id" ]; then
-                        echo "No running HAProxy container found."
-                        read -r -p "Press enter to continue"
-                    else
-                        # Executing commands in the found container
-                        docker exec -it "$container_id" bash -c "bash"
-                    fi
-                    show_splash_screen
-                    ;;
+                  # Logic for Enter HAProxy
+                  container_id=$(docker ps -qf "name=lite-node-haproxy")
+                  if [ -z "$container_id" ]; then
+                    echo "No running HAProxy container found."
+                    read -r -p "Press enter to continue"
+                  else
+                    # Executing commands in the found container
+                    docker exec -it "$container_id" bash -c "bash"
+                  fi
+                  show_splash_screen
+                  ;;
                 "Logs HAProxy")
-                    # Logic for Enter HAProxy
-                    container_id=$(docker ps -qf "name=lite-node-haproxy")
-                    if [ -z "$container_id" ]; then
-                        echo "No running HAProxy container found."
-                        read -r -p "Press enter to continue"
-                    else
-                        # Logs
-                        docker logs "$container_id" | more
-                        read -r -p "End of logs reached, press enter to continue"
-                    fi
-                    show_splash_screen
-                    ;;
+                  # Logic for Enter HAProxy
+                  container_id=$(docker ps -qf "name=lite-node-haproxy")
+                  if [ -z "$container_id" ]; then
+                    echo "No running HAProxy container found."
+                    read -r -p "Press enter to continue"
+                  else
+                    # Logs
+                    docker logs "$container_id" | more
+                    read -r -p "End of logs reached, press enter to continue"
+                  fi
+                  show_splash_screen
+                  ;;
               esac
               ;;
             "Exit")
-                clear
-                echo "Thanks for using Koios Lite Node."
-                exit 0  # Exit the menu loop
-                ;;
+              clear
+              echo "Thanks for using Koios Lite Node."
+              exit 0  # Exit the menu loop
+              ;;
         esac
     done
 }
@@ -693,6 +685,13 @@ display_ui() {
   show_splash_screen
   # Wait for gum style commands to complete
   menu
+}
+
+about(){
+  gum style --foreground 121 --border-foreground 121 --align center "$(gum join --vertical \
+    "$(show_splash_screen)" \
+    "$(gum style --align center --width 50 --margin "1 2" --padding "2 2" 'About: ' ' Koios Lite Node administration tool.')" \
+    "$(gum style --align center --width 50 'https://github.com/koios-official/Lite-Node')")"
 }
 
 show_splash_screen(){
@@ -712,8 +711,8 @@ show_splash_screen(){
   gum style \
     --border none \
     --border-foreground 121 \
-    --margin "2" \
-    --padding "2 2" \
+    --margin "1" \
+    --padding "1 2" \
     --background black \
     --foreground 121 \
     "$combined_layout"
@@ -754,11 +753,8 @@ display_help_usage() {
 process_args() {
   case "$1" in
     --about)
-      gum style --border rounded --foreground 121 --border-foreground 121 --align center "$(gum join --vertical \
-        "$(show_splash_screen)" \
-        "$(gum style --align center --width 50 --margin "1 2" --padding "2 4" 'About: ' ' Koios administration tool.')" \
-        "$(gum style --align center --width 50 'github.com/koios-official/Lite-Node')")"
-        show_ui=false
+      about
+      show_ui=false
       ;;
     --install-dependencies)
       rm -f ./.dependency_installation_status 
