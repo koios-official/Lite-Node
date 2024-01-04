@@ -78,8 +78,7 @@ services:
       test:  ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 60s
       timeout: 5s
-      # retries: 5
-    command: postgres
+    command: postgres -c max_connections=200 -c wal_level=minimal -c max_wal_senders=0 -c synchronous_commit=off
     restart: on-failure
     logging:
       driver: "json-file"
