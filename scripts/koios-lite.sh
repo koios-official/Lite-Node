@@ -386,9 +386,9 @@ menu() {
         choice=$(gum choose --height 15 --item.foreground 121 --cursor.foreground 39 "Tools" "Docker" "Setup" "Advanced" "Config" "About" "Refresh Status" "$(gum style --foreground 160 "Exit")")
 
         case "$choice" in
-						"Refresh Status")
-							display_ui
-						;;
+            "Refresh Status")
+              display_ui
+              ;;
             "Tools")
             setup_choice=$(gum choose --height 15 --cursor.foreground 229 --item.foreground 39 "$(gum style --foreground 87 "gLiveView")" "$(gum style --foreground 87 "cntools")"  "$(gum style --foreground 117 "Enter PSQL")" "$(gum style --foreground 117 "DBs Lists")" "$(gum style --foreground 208 "Back")")
             case "$setup_choice" in
@@ -582,7 +582,7 @@ menu() {
                     else
                         # Logs
                         docker logs "$container_id" | more
-												read -r -p "End of logs reached, press enter to continue"
+                        read -r -p "End of logs reached, press enter to continue"
                     fi
                     show_splash_screen                  
                     ;;
@@ -607,7 +607,7 @@ menu() {
                     else
                         # Logs
                         docker logs "$container_id" | more
-												read -r -p "End of logs reached, press enter to continue"
+                        read -r -p "End of logs reached, press enter to continue"
                     fi
                     show_splash_screen
                     ;;
@@ -632,7 +632,7 @@ menu() {
                     else
                         # Logs
                         docker logs "$container_id" | more
-												read -r -p "End of logs reached, press enter to continue"
+                        read -r -p "End of logs reached, press enter to continue"
                     fi
                     show_splash_screen
                     ;;
@@ -645,7 +645,7 @@ menu() {
                     else
                         # Logs
                         docker logs "$container_id" | more
-												read -r -p "End of logs reached, press enter to continue"
+                        read -r -p "End of logs reached, press enter to continue"
                     fi
                     show_splash_screen
                     ;;
@@ -670,7 +670,7 @@ menu() {
                     else
                         # Logs
                         docker logs "$container_id" | more
-												read -r -p "End of logs reached, press enter to continue"
+                        read -r -p "End of logs reached, press enter to continue"
                     fi
                     show_splash_screen
                     ;;
@@ -687,7 +687,7 @@ menu() {
 
 # Enhanced display UI function using gum layout
 display_ui() {
-	install_dependencies || { echo "Failed to install dependencies."; exit 0; }
+  install_dependencies || { echo "Failed to install dependencies."; exit 0; }
 
   show_splash_screen
   # Wait for gum style commands to complete
@@ -717,7 +717,7 @@ show_splash_screen(){
     --foreground 121 \
     "$combined_layout"
 
-	docker_status
+  docker_status
 
   gum style \
                 --foreground 121 --border-foreground 121 --border double \
