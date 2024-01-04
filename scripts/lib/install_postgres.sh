@@ -14,27 +14,27 @@ NOT_OK_FILE="NotOk.txt"
 
 # Loop through all .sql files in the rpc folder and its subfolders
 find /scripts/sql/rpc -name '*.sql' | sort | while read -r sql_file; do
-    # Create a temporary SQL file
-    TEMP_SQL_FILE="temp_$(basename "$sql_file")"
+  # Create a temporary SQL file
+  TEMP_SQL_FILE="temp_$(basename "$sql_file")"
 
-    # Replace the placeholder with the actual schema name
-    sed "s/{{SCHEMA}}/$SCHEMA_NAME/g" "$sql_file" > "$TEMP_SQL_FILE"
+  # Replace the placeholder with the actual schema name
+  sed "s/{{SCHEMA}}/$SCHEMA_NAME/g" "$sql_file" > "$TEMP_SQL_FILE"
 
-    # Execute the SQL file and capture the output
-    SQL_OUTPUT=$(psql -qt -d "${POSTGRES_DB}" -U "${POSTGRES_USER}" --host="${POSTGRES_HOST}" < "$TEMP_SQL_FILE" 2>&1)
+  # Execute the SQL file and capture the output
+  SQL_OUTPUT=$(psql -qt -d "${POSTGRES_DB}" -U "${POSTGRES_USER}" --host="${POSTGRES_HOST}" < "$TEMP_SQL_FILE" 2>&1)
 
-    # Check for "ERROR:" in the SQL output
-    if echo "$SQL_OUTPUT" | grep -q "ERROR:"; then
-        # If error is found, append the file name to NotOk.txt
-        echo "$sql_file: ${SQL_OUTPUT}" >> "$NOT_OK_FILE"
-    else
-        # If no error, append the file name to Ok.txt
-        echo "$sql_file" >> "$OK_FILE"
-    fi
+  # Check for "ERROR:" in the SQL output
+  if echo "$SQL_OUTPUT" | grep -q "ERROR:"; then
+    # If error is found, append the file name to NotOk.txt
+    echo "$sql_file: ${SQL_OUTPUT}" >> "$NOT_OK_FILE"
+  else
+    # If no error, append the file name to Ok.txt
+    echo "$sql_file" >> "$OK_FILE"
+  fi
 
-    # Remove the temporary file
-    #echo "$TEMP_SQL_FILE"
-    rm "$TEMP_SQL_FILE"
+  # Remove the temporary file
+  #echo "$TEMP_SQL_FILE"
+  rm "$TEMP_SQL_FILE"
 done
 
 psql -qt -d "${POSTGRES_DB}" -U "${POSTGRES_USER}" --host="${POSTGRES_HOST}" -c "NOTIFY pgrst, 'reload schema'" >/dev/null
