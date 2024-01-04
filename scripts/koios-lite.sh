@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 # Global configuration
+# shellcheck disable=SC1091,SC2015
+
 VERSION=0.0.1
 NAME="admin tool"
 # Get the full path of the current script's directory
-script_dir=$(dirname "$(realpath "$BASH_SOURCE")")
+script_dir=$(dirname "$(realpath "${BASH_SOURCE[@]}")")
 # Remove the last folder from the path and rename it to KLITE_HOME
 KLITE_HOME=$(dirname "$script_dir")
 path_line="export PATH=\"$script_dir:\$PATH\""
@@ -144,7 +146,7 @@ docker_status(){
       local up_icon="$2"
       local down_icon="$3"
         if [[ -n $(docker ps -qf "name=${container_name}" 2>/dev/null) ]]; then
-            if [[ -n $(docker ps -f "name=${container_name}" 2>/dev/null | grep -e '(unhealthy)' -e '(health: ' 2>/dev/null) ]]; then
+            if docker ps -f "name=${container_name}" | grep -q -e '(unhealthy)' -e '(health: ' ; then
                 echo "${up_icon} $(gum style --foreground 160 " ${container_name}" 2>/dev/null) $(gum style --bold --foreground 160 " UP (unhealthy)" 2>/dev/null)";
             else
                 echo "${up_icon} $(gum style --foreground 121 " ${container_name}" 2>/dev/null) $(gum style --bold --foreground 121 " UP" 2>/dev/null)";
@@ -201,7 +203,7 @@ docker_install() {
                     sudo apt-get update
                     sudo apt-get install -y ca-certificates curl gpg
                     sudo install -m 0755 -d /etc/apt/keyrings
-                    curl -fsSL https://download.docker.com/linux/${ID}/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+                    curl -fsSL https://download.docker.com/linux/"${ID}"/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
                     sudo chmod a+r /etc/apt/keyrings/docker.gpg
                     # Add the repository to Apt sources:
                     echo \
@@ -235,14 +237,13 @@ docker_install() {
                 echo "Error: Failed to add user '${USER}' to the 'docker' group."
                 exit 1  # Exit the script with an error status
             fi
-            # exec sudo -i -u ${USER}
             ;;
         Darwin*)
             gum spin --spinner dot --title "Installing Docker..." -- brew install --cask docker
             # Add current user to docker group
-            if sudo dscl . create /Groups/docker && sudo dseditgroup -o edit -a $USER -t user docker; then
+            if sudo dscl . create /Groups/docker && sudo dseditgroup -o edit -a "${USER}" -t user docker; then
                 clear
-                echo "User '$USER' successfully added to the 'docker' group."
+                echo "User '${USER}' successfully added to the 'docker' group."
                 echo "For the changes to take effect, kindly log out and then log back in. This will ensure the user is correctly assigned to the new group. After doing so, please re-execute this script."
                 exit 0  # Exit the script successfully
             else
@@ -291,10 +292,10 @@ check_env_file() {
     if [ ! -f ".env" ]; then  # Check if .env does not exist
         if [ -f ".env.example" ]; then  # Check if .env.example exists
             cp .env.example .env  # Copy .env.example to .env
-	    echo ".env file created from .env.example... please inspect the .env file and adjust variables (e.g. network) accordingly"
-	    echo -e "\nCurrent default settings:\n"
-	    cat .env
-	    read -p "Press enter to continue"
+            echo ".env file created from .env.example... please inspect the .env file and adjust variables (e.g. network) accordingly"
+            echo -e "\nCurrent default settings:\n"
+            cat .env
+        read -r -p "Press enter to continue"
         else
             touch .env  # Create a new .env file
             echo "New .env file created."
@@ -305,7 +306,7 @@ check_env_file() {
 # Function to reset .env file
 reset_env_file() {
     if [ -f ".env" ]; then  # Check if .env  
-        if $(gum confirm --unselected.foreground 231 --unselected.background 39 --selected.bold --selected.background 121 --selected.foreground 231 "Are you sure you want to reset the .env file?"); then
+        if gum confirm --unselected.foreground 231 --unselected.background 39 --selected.bold --selected.background 121 --selected.foreground 231 "Are you sure you want to reset the .env file?"; then
             backup_name=".env.$(date +%Y%m%d%H%M%S)"  # Create a backup name with timestamp
             mv .env "$backup_name"  # Move .env to backup
             echo "Reset .env file. Backup created: $backup_name"
@@ -405,7 +406,7 @@ menu() {
                     container_id=$(docker ps -qf "name=cardano-node")
                     if [ -z "$container_id" ]; then
                         echo "No running Node container found."
-			read -p "Press enter to continue"
+                        read -r -p "Press enter to continue"
                     else
                         # Executing commands in the found container
                         docker exec -it "$container_id" bash -c "/opt/cardano/cnode/scripts/gLiveView.sh"
@@ -417,7 +418,7 @@ menu() {
                     container_id=$(docker ps -qf "name=cardano-node")
                     if [ -z "$container_id" ]; then
                         echo "No running Node container found."
-			read -p "Press enter to continue"
+                        read -r -p "Press enter to continue"
                     else
                         # Executing commands in the found container
                         docker exec -it "$container_id" bash -c "/opt/cardano/cnode/scripts/cntools.sh"
@@ -429,7 +430,7 @@ menu() {
                     container_id=$(docker ps -qf "name=postgress")
                     if [ -z "$container_id" ]; then
                         echo "No running PostgreSQL found."
-			read -p "Press enter to continue"
+                        read -r -p "Press enter to continue"
                     else
                         # Executing commands in the found container
                         docker exec -it "$container_id" bash -c "/usr/bin/psql -U $POSTGRES_USER -d $POSTGRES_DB"
@@ -441,7 +442,7 @@ menu() {
                     container_id=$(docker ps -qf "name=postgress")
                     if [ -z "$container_id" ]; then
                         echo "No running PostgreSQL found."
-			read -p "Press enter to continue"
+                        read -r -p "Press enter to continue"
                     else
                         # Executing commands in the found container
                         docker exec -it -u postgres "$container_id" bash -c "/scripts/kltables.sh > /scripts/TablesAndIndexesList.txt"
@@ -472,16 +473,16 @@ menu() {
                     container_id=$(docker ps -qf "name=postgress")
                     if [ -z "$container_id" ]; then
                         echo "No running PostgreSQL container found."
-			read -p "Press enter to continue"
+                        read -r -p "Press enter to continue"
                     else
                         # Executing commands in the found container
                         docker exec "$container_id" bash -c "/scripts/lib/install_postgres.sh"
-			echo -e "SQL scripts have finished processing, following scripts were executed successfully:\n"
+                        echo -e "SQL scripts have finished processing, following scripts were executed successfully:\n"
                         docker exec "$container_id" bash -c "cat /scripts/sql/rpc/Ok.txt"
-			echo -e "\n\nThe following errors were encountered during processing:\n"
+                        echo -e "\n\nThe following errors were encountered during processing:\n"
                         docker exec "$container_id" bash -c "cat /scripts/sql/rpc/NotOk.txt"
-			echo -e "\n\n"
-			read -p "Press enter key to continue"
+                        echo -e "\n\n"
+                        read -r -p "Press enter to continue"
                     fi
                     show_splash_screen
                     ;;
@@ -574,7 +575,7 @@ menu() {
                     container_id=$(docker ps -qf "name=cardano-node")
                     if [ -z "$container_id" ]; then
                         echo "No running Node container found."
-			read -p "Press enter to continue"
+                        read -r -p "Press enter to continue"
                     else
                         # Executing commands in the found container
                         docker exec -it "$container_id" bash -c "bash"
@@ -586,7 +587,7 @@ menu() {
                     container_id=$(docker ps -qf "name=cardano-node")
                     if [ -z "$container_id" ]; then
                         echo "No running Node container found."
-			read -p "Press enter to continue"
+                        read -r -p "Press enter to continue"
                     else
                         # Logs
                         docker logs "$container_id" | more
@@ -598,7 +599,7 @@ menu() {
                     container_id=$(docker ps -qf "name=postgress")
                     if [ -z "$container_id" ]; then
                         echo "No running PostgreSQL container found."
-			red -p "Press enter to continue"
+                        red -p "Press enter to continue"
                     else
                         # Executing commands in the found container
                         docker exec -it "$container_id" bash -c "bash"
@@ -610,7 +611,7 @@ menu() {
                     container_id=$(docker ps -qf "name=postgress")
                     if [ -z "$container_id" ]; then
                         echo "No running PostgreSQL container found."
-			read -p "Press enter to continue"
+                        read -r -p "Press enter to continue"
                     else
                         # Logs
                         docker logs "$container_id" | more
@@ -622,7 +623,7 @@ menu() {
                     container_id=$(docker ps -qf "name=lite-node-cardano-db-sync")
                     if [ -z "$container_id" ]; then
                         echo "No running Dbsync container found."
-			read -p "Press enter to continue"
+                        read -r -p "Press enter to continue"
                     else
                         # Executing commands in the found container
                         docker exec -it "$container_id" bash -c "bash"
@@ -634,7 +635,7 @@ menu() {
                     container_id=$(docker ps -qf "name=lite-node-cardano-db-sync")
                     if [ -z "$container_id" ]; then
                         echo "No running Dbsync container found."
-			read -p "Press enter to continue"
+                        read -r -p "Press enter to continue"
                     else
                         # Logs
                         docker logs "$container_id" | more
@@ -646,7 +647,7 @@ menu() {
                     container_id=$(docker ps -qf "name=lite-node-postgrest")
                     if [ -z "$container_id" ]; then
                         echo "No running PostgREST container found."
-			read -p "Press enter to continue"
+                        read -r -p "Press enter to continue"
                     else
                         # Logs
                         docker logs "$container_id" | more
@@ -658,7 +659,7 @@ menu() {
                     container_id=$(docker ps -qf "name=lite-node-haproxy")
                     if [ -z "$container_id" ]; then
                         echo "No running HAProxy container found."
-			read -p "Press enter to continue"
+                        read -r -p "Press enter to continue"
                     else
                         # Executing commands in the found container
                         docker exec -it "$container_id" bash -c "bash"
@@ -670,7 +671,7 @@ menu() {
                     container_id=$(docker ps -qf "name=lite-node-haproxy")
                     if [ -z "$container_id" ]; then
                         echo "No running HAProxy container found."
-			read -p "Press enter to continue"
+                        read -r -p "Press enter to continue"
                     else
                         # Logs
                         docker logs "$container_id" | more
@@ -812,7 +813,7 @@ process_args() {
         *)
             # Check if the number of arguments is zero
             if [ $# -eq 0 ]; then
-		check_env_file
+                check_env_file
                 display_ui  # Call the display function
             else
                 echo "Unknown command: '$1'"
