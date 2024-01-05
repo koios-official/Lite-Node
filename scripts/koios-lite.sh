@@ -477,12 +477,12 @@ menu() {
                   ;;
                 #"Initialise Dbsync")
                 #    # Logic for installing Dbsync
-                #    container_id=$(docker ps -qf "name=lite-node-cardano-db-sync")
+                #    container_id=$(docker ps -qf "name=${PROJ_NAME}-cardano-db-sync")
                 #    docker exec "$container_id" bash -c "/scripts/lib/install_dbsync.sh"
                 #    ;;
                 #"Initialise PostgREST")
                 #    # Logic for installing PostgREST
-                #    container_id=$(docker ps -qf "name=lite-node-postgrest")
+                #    container_id=$(docker ps -qf "name=${PROJ_NAME}-postgrest")
                 #    if [ -z "$container_id" ]; then
                 #        echo "No running PostgreSQL container found."
                 #    else
@@ -494,7 +494,7 @@ menu() {
                 #    ;;
                 #"Initialise HAProxy")
                 #    # Logic for installing HAProxy
-                #    container_id=$(docker ps -qf "name=lite-node-haproxy")
+                #    container_id=$(docker ps -qf "name=${PROJ_NAME}-haproxy")
                 #    if [ -z "$container_id" ]; then
                 #        echo "No running PostgreSQL container found."
                 #    else
@@ -603,7 +603,7 @@ menu() {
                   ;;
                 "Enter Dbsync")
                   # Logic for Enter Dbsync
-                  container_id=$(docker ps -qf "name=lite-node-cardano-db-sync")
+                  container_id=$(docker ps -qf "name=${PROJ_NAME}-cardano-db-sync")
                   if [ -z "$container_id" ]; then
                     echo "No running Dbsync container found."
                     read -r -p "Press enter to continue"
@@ -615,7 +615,7 @@ menu() {
                   ;;
                 "Logs Dbsync")
                   # Logic for Enter Dbsync
-                  container_id=$(docker ps -qf "name=lite-node-cardano-db-sync")
+                  container_id=$(docker ps -qf "name=${PROJ_NAME}-cardano-db-sync")
                   if [ -z "$container_id" ]; then
                     echo "No running Dbsync container found."
                     read -r -p "Press enter to continue"
@@ -628,7 +628,7 @@ menu() {
                   ;;
                 "Logs PostgREST")
                   # Logic for Enter PostgREST
-                  container_id=$(docker ps -qf "name=lite-node-postgrest")
+                  container_id=$(docker ps -qf "name=${PROJ_NAME}-postgrest")
                   if [ -z "$container_id" ]; then
                     echo "No running PostgREST container found."
                     read -r -p "Press enter to continue"
@@ -641,7 +641,7 @@ menu() {
                   ;;
                 "Enter HAProxy")
                   # Logic for Enter HAProxy
-                  container_id=$(docker ps -qf "name=lite-node-haproxy")
+                  container_id=$(docker ps -qf "name=${PROJ_NAME}-haproxy")
                   if [ -z "$container_id" ]; then
                     echo "No running HAProxy container found."
                     read -r -p "Press enter to continue"
@@ -653,7 +653,7 @@ menu() {
                   ;;
                 "Logs HAProxy")
                   # Logic for Enter HAProxy
-                  container_id=$(docker ps -qf "name=lite-node-haproxy")
+                  container_id=$(docker ps -qf "name=${PROJ_NAME}-haproxy")
                   if [ -z "$container_id" ]; then
                     echo "No running HAProxy container found."
                     read -r -p "Press enter to continue"
@@ -792,16 +792,16 @@ process_args() {
       show_logs "postgress"
       ;;
     --enter-dbsync)
-      execute_in_container "lite-node-cardano-db-sync" "bash"
+      execute_in_container "${PROJ_NAME}-cardano-db-sync" "bash"
       ;;
     --logs-dbsync)
-      show_logs "lite-node-cardano-db-sync"
+      show_logs "${PROJ_NAME}-cardano-db-sync"
       ;;
     --enter-haproxy)
-      execute_in_container "lite-node-haproxy" "bash"
+      execute_in_container "${PROJ_NAME}-haproxy" "bash"
       ;;
     --logs-haproxy)
-      show_logs "lite-node-haproxy"
+      show_logs "${PROJ_NAME}-haproxy"
       ;;
     --help|-h)
       display_help_usage
