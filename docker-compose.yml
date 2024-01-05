@@ -141,6 +141,16 @@ services:
         max-size: "200k"
         max-file: "10"
 
+  cron:
+    build: .
+    container_name: cron
+    volumes:
+      - ./scripts/cron:/etc/cron.d/
+      - ./scripts:/scripts
+    # Uncomment for persistent logs
+    # - ./logs:/var/log
+    restart: unless-stopped
+
 volumes:
   node-db:
   node-ipc:
