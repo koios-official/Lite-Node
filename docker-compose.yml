@@ -1,5 +1,6 @@
 version: '3'
 
+name: "${PROJ_NAME}"
 services:
   cardano-node:
     image: cardanocommunity/cardano-node:latest
@@ -86,16 +87,6 @@ services:
         max-size: "200k"
         max-file: "10"
 
-# Develpoment and Testing
-  # swagger:
-  #   image: swaggerapi/swagger-ui
-  #   ports:
-  #     - "8080:8080"
-  #   expose:
-  #     - "8080"
-  #   environment:
-  #     API_URL: http://127.0.0.1:8050/
-
   postgrest:
     image: postgrest/postgrest:v12.0.2
     hostname: postgrest
@@ -118,6 +109,41 @@ services:
       options:
         max-size: "200k"
         max-file: "10"
+
+  portainer-agent:
+    image: portainer/agent:latest
+    environment:
+      AGENT_CLUSTER_ADDR: tasks.portainer-agent
+      AGENT_PORT: 9001
+    ports:
+      - 9001:9001
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/volumes:/var/lib/docker/volumes
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    command: -H tcp://tasks.portainer-agent:9001 --tlsskipverify
+    ports:
+      - 9443:9443
+      - 8000:8000
+    volumes:
+      - portainer-data:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+    depends_on:
+      - portainer-agent
+
+  # Develpoment and Testing
+  # swagger:
+  #   image: swaggerapi/swagger-ui
+  #   ports:
+  #     - "8080:8080"
+  #   expose:
+  #     - "8080"
+  #   environment:
+  #     API_URL: http://127.0.0.1:8050/
+
 
   haproxy:
     image: haproxy:2.9.0-bookworm
@@ -157,3 +183,4 @@ volumes:
   node-cfg:
   db-sync-data:
   postgresdb:
+  portainer-data:

@@ -383,12 +383,9 @@ handle_env_file() {
 # Menu function with improved UI and submenus
 menu() {
     while true; do
-        choice=$(gum choose --height 15 --item.foreground 121 --cursor.foreground 39 "Tools" "Docker" "Setup" "Advanced" "Config" "Refresh Status" "$(gum style --foreground 160 "Exit")")
+        choice=$(gum choose --height 15 --item.foreground 121 --cursor.foreground 39 "Tools" "Docker" "Setup" "Advanced" "Config" "$(gum style --foreground 160 "Exit")")
 
         case "$choice" in
-            "Refresh Status")
-              display_ui
-              ;;
             "Tools")
             setup_choice=$(gum choose --height 15 --cursor.foreground 229 --item.foreground 39 "$(gum style --foreground 87 "gLiveView")" "$(gum style --foreground 87 "cntools")"  "$(gum style --foreground 117 "Enter PSQL")" "$(gum style --foreground 117 "DBs Lists")" "$(gum style --foreground 208 "Back")")
             case "$setup_choice" in
@@ -717,12 +714,6 @@ show_splash_screen(){
     --foreground 121 \
     "$combined_layout"
 
-  docker_status
-
-  gum style \
-    --foreground 121 --border-foreground 121 --border double \
-    --align center --width 50 \
-    "Above container status information is accurate as of $(date), use Refresh Status menu option to get latest status"
 }
 
 display_help_usage() {
