@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION ${{SCHEMA}}.account_addresses(_stake_addresses text [], _first_only boolean DEFAULT FALSE, _empty boolean DEFAULT FALSE)
+CREATE OR REPLACE FUNCTION {{SCHEMA}}.account_addresses(_stake_addresses text [], _first_only boolean DEFAULT FALSE, _empty boolean DEFAULT FALSE)
 RETURNS TABLE (
   stake_address varchar,
   addresses jsonb
@@ -71,4 +71,4 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION ${{SCHEMA}}.account_addresses IS 'Get all addresses associated with given accounts, optionally filtered by first used address only or inclusion of used but empty(no utxo) addresses.'; -- noqa: LT01
+COMMENT ON FUNCTION {{SCHEMA}}.account_addresses IS 'Get all addresses associated with given accounts, optionally filtered by first used address only or inclusion of used but empty(no utxo) addresses.'; -- noqa: LT01
