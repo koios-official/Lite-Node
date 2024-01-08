@@ -1,6 +1,7 @@
 CREATE OR REPLACE FUNCTION {{SCHEMA}}.asset_addresses(_asset_policy text, _asset_name text DEFAULT '')
 RETURNS TABLE (
   payment_address varchar,
+  stake_address varchar,
   quantity text
 )
 LANGUAGE plpgsql
@@ -23,18 +24,21 @@ BEGIN
   RETURN QUERY
     SELECT
       x.address,
+      x.stake_address,
       SUM(x.quantity)::text
     FROM
       (
         SELECT
           txo.address,
+          sa.view as stake_address,
           mto.quantity
         FROM ma_tx_out AS mto
         LEFT JOIN tx_out AS txo ON txo.id = mto.tx_out_id
+        LEFT JOIN stake_address sa on txo.stake_address_id = sa.id
         WHERE mto.ident = _asset_id
           AND txo.consumed_by_tx_id IS NULL
       ) AS x
-    GROUP BY x.address;
+    GROUP BY x.address, x.stake_address;
 END;
 $$;
 
