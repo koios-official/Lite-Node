@@ -1,0 +1,4 @@
+* * * * * /scripts/cron/postgres-init.sh >> /var/log/cron_postgres_init.log 2>&1
+* * * * * /scripts/cron/asset-registry-update.sh >> /var/log/cron_asset_registry_update.log 2>&1
+* * * * * /scripts/cron/asset-info-cache-update.sh >> /var/log/cron_asset_info_cache.log 2>&1
+

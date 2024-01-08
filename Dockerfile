@@ -2,7 +2,7 @@
 FROM alpine:latest
 
 # Install jq, curl, PostgreSQL client, and gawk
-RUN apk add --no-cache jq curl postgresql-client gawk
+RUN apk add --no-cache jq curl postgresql-client gawk git bash
 
 # Set up the cron job environment
 # Create a directory for cron jobs

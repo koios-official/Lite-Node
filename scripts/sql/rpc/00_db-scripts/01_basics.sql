@@ -168,7 +168,7 @@ AS
 $$
   BEGIN
     INSERT INTO
-      GREST.CONTROL_TABLE (key, last_value, artifacts)
+      {{SCHEMA}}.CONTROL_TABLE (key, last_value, artifacts)
     VALUES
       (_key, _last_value, _artifacts)
     ON CONFLICT (

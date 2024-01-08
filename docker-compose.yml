@@ -168,6 +168,14 @@ services:
 
   cron:
     build: .
+    environment:
+      NETWORK: ${NETWORK:-mainnet}
+      POSTGRES_HOST: postgress
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      PGDATABASE: ${POSTGRES_DB}
+      PGUSER: ${POSTGRES_USER}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      RPC_SCHEMA: ${RPC_SCHEMA}
     container_name: cron
     volumes:
       - ./scripts/cron:/etc/cron.d/
