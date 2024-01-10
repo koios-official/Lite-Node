@@ -1,8 +1,21 @@
 #!/bin/bash
 
 CURRTIME=$(date +%s)
+echo "Starting postgres-init script at `date`"
 
-[[ $(( $(date +%s) - $(date --date="$(psql -Aqt -h ${POSTGRES_HOST} -c 'select time from block order by id desc limit 1;')" +%s) )) -lt 3600 ]] || exit 1
+BLOCK_TABLE_EXISTS=`psql -Aqt -h ${POSTGRES_HOST} -c "select exists(select 1 from information_schema.tables where table_name = 'block' and table_schema = 'public')"`
+echo "BLOCK TABLE EXISTS: $BLOCK_TABLE_EXISTS"
+
+if [[ $BLOCK_TABLE_EXISTS == "f" ]]; then
+  echo "Block table in public schema does not exist yet, aborting"
+  exit 1
+fi
+
+DATE_DIFF=$(( $(date +%s) - $(date --date="$(psql -Aqt -h ${POSTGRES_HOST} -c 'select time from block order by id desc limit 1;')" +%s) ))
+echo "Date Diff is $DATE_DIFF"
+
+[[ $DATE_DIFF -lt 3600 ]] || { echo "date difference greater than 1 hour, so exiting for later retry"; exit 1; }
+
 echo "Block table seems to be on tip or close enough, current time is `date`"
 
 IS_PG_INIT=`psql -h ${POSTGRES_HOST} -Aqb -t -c "select exists(select 1 from information_schema.tables where table_name = 'control_table' and table_schema = '${RPC_SCHEMA}');"`
