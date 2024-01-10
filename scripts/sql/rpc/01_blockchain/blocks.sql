@@ -9,6 +9,7 @@ RETURNS TABLE (
   block_time integer,
   tx_count bigint,
   vrf_key character varying,
+  pool character varying,
   proto_major word31type,
   proto_minor word31type,
   op_cert_counter word63type,
@@ -26,6 +27,7 @@ AS $$
     EXTRACT(EPOCH FROM b.time)::integer AS block_time,
     b.tx_count,
     b.vrf_key,
+    ph.view AS pool,
     b.proto_major,
     b.proto_minor,
     b.op_cert_counter,
@@ -36,6 +38,7 @@ AS $$
     ) AS parent_hash
   FROM block AS b
   LEFT JOIN slot_leader AS sl ON b.slot_leader_id = sl.id
+  LEFT JOIN pool_hash AS ph ON sl.pool_hash_id = ph.id
   ORDER BY b.id DESC;
 $$;
 
