@@ -4,7 +4,7 @@ RETURNS TABLE (
   epoch_no word31type,
   abs_slot word63type,
   epoch_slot word31type,
-  block_no word31type,
+  block_height word31type,
   block_size word31type,
   block_time integer,
   tx_count bigint,
