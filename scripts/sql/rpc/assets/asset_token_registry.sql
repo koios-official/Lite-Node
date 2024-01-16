@@ -20,7 +20,8 @@ AS $$
     url,
     decimals,
     logo
-  FROM {{SCHEMA}}.asset_registry_cache;
+  FROM {{SCHEMA}}.asset_registry_cache
+  ORDER BY asset_policy,asset_name;
 $$;
 
 COMMENT ON FUNCTION {{SCHEMA}}.asset_token_registry IS 'An array of token registry information (registered via github) for each asset';
