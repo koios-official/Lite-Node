@@ -74,7 +74,7 @@ BEGIN
     LEFT JOIN {{SCHEMA}}.asset_info_cache AS aic ON aic.asset_id = ma.id
     LEFT JOIN datum ON datum.id = tx_out.inline_datum_id
     WHERE script.hash = DECODE(_script_hash,'hex')
-    AND tx_out.consumed_by_tx_id IS NULL
+      AND tx_out.consumed_by_tx_id IS NULL
   ;
 END;
 $$;

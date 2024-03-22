@@ -5,31 +5,24 @@ RETURNS TABLE (
   stake_address varchar,
   quantity text
 )
-LANGUAGE plpgsql
+LANGUAGE sql STABLE
 AS $$
-DECLARE
-  _asset_policy_decoded bytea;
-  _asset_ids int[];
-  _isatoc int;
 BEGIN
-  SELECT DECODE(_asset_policy, 'hex') INTO _asset_policy_decoded;
-
-    RETURN QUERY
-      SELECT
-        ENCODE(ma.name, 'hex') AS asset_name,
-        txo.address,
-        sa.view as stake_address,
-        SUM(mto.quantity)::text
-      FROM multi_asset AS ma
-      LEFT JOIN ma_tx_out AS mto ON mto.ident = ma.id
-      LEFT JOIN tx_out AS txo ON txo.id = mto.tx_out_id
-      LEFT JOIN stake_address as sa on txo.stake_address_id = sa.id
-      WHERE ma.policy = DECODE(_asset_policy, 'hex')
-        AND txo.consumed_by_tx_id IS NULL
-      GROUP BY
-        ma.name,
-        txo.address,
-        sa.view;
+  SELECT
+    ENCODE(ma.name, 'hex') AS asset_name,
+    txo.address,
+    sa.view as stake_address,
+    SUM(mto.quantity)::text
+  FROM multi_asset AS ma
+  LEFT JOIN ma_tx_out AS mto ON mto.ident = ma.id
+  LEFT JOIN tx_out AS txo ON txo.id = mto.tx_out_id
+  LEFT JOIN stake_address as sa on txo.stake_address_id = sa.id
+  WHERE ma.policy = DECODE(_asset_policy, 'hex')
+    AND txo.consumed_by_tx_id IS NULL
+  GROUP BY
+    ma.name,
+    txo.address,
+    sa.view;
 END;
 $$;
 

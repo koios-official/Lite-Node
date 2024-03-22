@@ -1,24 +1,3 @@
-CREATE OR REPLACE FUNCTION {{SCHEMA}}.asset_policy_info(_asset_policy text)
-RETURNS TABLE (
-  asset_name text,
-  asset_name_ascii text,
-  fingerprint varchar,
-  minting_tx_hash text,
-  total_supply text,
-  mint_cnt bigint,
-  burn_cnt bigint,
-  creation_time integer,
-  minting_tx_metadata jsonb,
-  token_registry_metadata jsonb
-)
-LANGUAGE plpgsql
-AS $$
-BEGIN
-  RETURN QUERY
-    SELECT * FROM {{SCHEMA}}.policy_asset_info(_asset_policy);
-END;
-$$;
-
 CREATE OR REPLACE FUNCTION {{SCHEMA}}.policy_asset_info(_asset_policy text)
 RETURNS TABLE (
   asset_name text,
