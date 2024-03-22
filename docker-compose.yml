@@ -3,7 +3,7 @@ version: '3'
 name: "${PROJ_NAME}"
 services:
   cardano-node:
-    image: cardanocommunity/cardano-node:latest
+    image: cardanocommunity/cardano-node:8.7.3
     init: true
     hostname: cardano-node
     environment:
@@ -28,7 +28,7 @@ services:
         max-file: "10"
 
   cardano-db-sync:
-    image: ghcr.io/intersectmbo/cardano-db-sync:sancho-3-0-0
+    image: ghcr.io/intersectmbo/cardano-db-sync:13.2.0.1
     hostname: cardano-db-sync
     environment:
       DISABLE_LEDGER: ${DISABLE_LEDGER}
@@ -63,7 +63,7 @@ services:
         max-file: "10"
 
   postgress:
-    image: postgres:16.1-bullseye
+    image: postgres:16.2-bullseye
     hostname: postgress
     volumes:
       - postgresdb:/var/lib/postgresql/data
@@ -146,7 +146,7 @@ services:
 
 
   haproxy:
-    image: haproxy:2.9.0-bookworm
+    image: haproxy:2.9.6-bookworm
     hostname: haproxy
     depends_on:
       - postgrest
