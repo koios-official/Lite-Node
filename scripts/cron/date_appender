@@ -1,2 +1,0 @@
-*/5 * * * * /scripts/cron/append_date.sh >> /var/log/cron.log 2>&1
-*/10 * * * * /scripts/cron/append_date2.sh >> /var/log/cron.log 2>&1

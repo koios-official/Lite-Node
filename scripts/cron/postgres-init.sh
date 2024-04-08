@@ -35,6 +35,3 @@ if [[ $IS_PG_INIT == "f" ]]; then
   psql -h ${POSTGRES_HOST} -qb -c "INSERT INTO ${RPC_SCHEMA}.control_table (key, last_value) VALUES ('postgres_init_timestamp','${CURRTIME}');"
   echo "Done postgres init"
 fi
-
-
-
